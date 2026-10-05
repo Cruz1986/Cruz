@@ -116,6 +116,14 @@ chapter × 1 000 + verse`) in the reference versification, which is the Tamil co
 - `days_with_passage(start, end, from, calendar, limit)`: upcoming days whose readings overlap a range of canonical
   verse keys.
 
+## Notifications
+
+- `notification_preferences` (one row per reader): enabled, parts, `preferred_time`, `timezone` (checked to be a real
+  time zone). `push_subscriptions`: the reader's devices. Both owner-only.
+- `notification_deliveries` (reader, local date): written by the job before sending, so a reminder goes out once.
+- `due_reminders(now, window)`: readers due now (service role only).
+- `notifications`: announcements with `status`, `sent_at` and `recipients`.
+
 ## Admin support
 
 - `celebrations.names_locked`, `lectionary_readings.is_edited`: set by the admin; the calendar generator and the

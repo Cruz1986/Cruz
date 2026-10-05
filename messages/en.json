@@ -70,7 +70,7 @@
     },
     "settings": {
       "title": "Settings",
-      "description": "Language, appearance and reading size."
+      "description": "Language, appearance, reading size and daily reminder."
     },
     "credits": {
       "title": "Sources & credits",
@@ -188,7 +188,8 @@
       "calendar": "Calendar",
       "media": "Media",
       "sources": "Sources",
-      "audit": "History"
+      "audit": "History",
+      "announcements": "Announcements"
     }
   },
   "roles": {
@@ -766,5 +767,65 @@
     "celebrations": "Calendar",
     "next": "Next: {date}",
     "results": "{count, plural, one {# result} other {# results}}"
+  },
+  "notifications": {
+    "labels": {
+      "today": "Today",
+      "gospel": "Gospel",
+      "saint": "Saint of the day",
+      "rosary": "Rosary",
+      "prayer": "Pray"
+    },
+    "title": "Daily reminder",
+    "description": "One notification a day at the time you choose, with the parts you want.",
+    "signInFirst": "Sign in to get a daily reminder on your phone or computer.",
+    "signIn": "Sign in",
+    "enabled": "Send me a daily reminder",
+    "parts": "Include",
+    "dailyReading": "Today's Gospel",
+    "saintOfDay": "Saint of the day",
+    "rosary": "Today's Rosary mysteries",
+    "prayer": "A prayer for the time of day",
+    "time": "Time",
+    "timezone": "Time zone",
+    "save": "Save reminder",
+    "saved": "Saved.",
+    "failed": "Could not save. Try again.",
+    "device": "This device",
+    "deviceOn": "This device receives reminders.",
+    "deviceOff": "This device does not receive reminders yet.",
+    "turnOn": "Allow notifications on this device",
+    "turnOff": "Stop on this device",
+    "blocked": "Notifications are blocked for this site. Allow them in your browser settings, then try again.",
+    "unsupported": "This browser can't receive notifications. On iPhone, add the app to your Home Screen first.",
+    "unavailable": "Notifications are not set up on this server yet.",
+    "test": "Send a test",
+    "testSent": "Test sent. It should arrive in a moment.",
+    "testTitle": "Notifications are working",
+    "testBody": "You will get your daily reminder at the time you chose.",
+    "otherDevice": "Already used by another account on this device. Sign out there first."
+  },
+  "adminAnnouncements": {
+    "title": "Announcements",
+    "description": "A notification to every reader who has turned on reminders, sent once at the time you set (India time).",
+    "new": "New announcement",
+    "edit": "Edit announcement",
+    "titleEn": "Title (English)",
+    "titleTa": "Title (Tamil)",
+    "bodyEn": "Message (English)",
+    "bodyTa": "Message (Tamil)",
+    "url": "Opens (path in the app)",
+    "urlHelp": "e.g. /today/2026-12-25 or /rosary. Leave empty for the home page.",
+    "scheduledAt": "Send at (India time)",
+    "cancel": "Cancel announcement",
+    "recipients": "{count, plural, one {# reader} other {# readers}}",
+    "status": {
+      "scheduled": "Scheduled",
+      "sending": "Sending",
+      "sent": "Sent",
+      "cancelled": "Cancelled",
+      "failed": "Failed"
+    },
+    "locked": "This announcement has gone out and can no longer be changed."
   }
 }

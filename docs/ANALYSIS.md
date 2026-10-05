@@ -3,7 +3,7 @@
 Response to the "First action — no coding" step of the master prompt in [PRD.md](./PRD.md) §22.
 No application code has been written. Implementation starts only after this plan is approved.
 
-Status: **approved 2026-10-05** · Phases 1–12 implemented
+Status: **approved 2026-10-05** · Phases 1–13 implemented
 
 ---
 
@@ -376,3 +376,4 @@ Defaults apply until you say otherwise. Data sources are evaluated in [CONTENT_R
 | `reading_history` (last position per translation)         | `history` of chapters, prayers and saints (latest 200)                                                                      | One list serves "Continue reading" and prayer/saint history                             |
 | Audit log readable by publishers                          | Readable by all staff; names shown through `staff_names()`                                                                  | Editors need to see what changed in the content they work on                            |
 | Admin edits overwritten by imports                        | `celebrations.names_locked`, `lectionary_readings.is_edited` and `liturgical_days.is_override` are respected by the scripts | Corrections made in the admin are not lost on the yearly regeneration                   |
+| One notification per enabled kind                         | One daily reminder combining the chosen parts, at one chosen time; deliveries logged per reader and local date              | Fewer interruptions; sending is idempotent however often the job runs                   |

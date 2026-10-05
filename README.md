@@ -57,4 +57,8 @@ pnpm db:test      # database migrations + pgTAP tests (needs local PostgreSQL + 
 - Phase 12 (search): done. One search for the Bible (references open the passage and list the upcoming Masses
   where it is read; words find verses), prayers, saints, Rosary mysteries, reflections and calendar
   celebrations with their next date, in Tamil and English; `/api/search`.
-- Next: Phase 13 (notifications).
+- Phase 13 (notifications): done. Daily reminder at the reader's chosen time and time zone with the parts they
+  choose (Gospel, saint of the day, Rosary, a prayer for the hour), one notification in their language; device
+  opt-in with Web Push and a test button; announcements scheduled by content admins; a scheduled job that sends
+  each reminder once; delivery behind a provider interface (Web Push or log).
+- Next: Phase 14 (testing, performance and security).

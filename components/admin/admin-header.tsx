@@ -1,7 +1,7 @@
 import { getTranslations } from "next-intl/server";
 import { ArrowLeft } from "lucide-react";
 import { Link } from "@/lib/i18n/navigation";
-import { canManageUsers, type RoleKey } from "@/lib/auth/roles";
+import { canManageUsers, isPublisher, type RoleKey } from "@/lib/auth/roles";
 import { NavLink } from "@/components/layout/nav-link";
 import { LanguageSwitcher } from "@/components/layout/language-switcher";
 import { SignOutButton } from "@/components/auth/sign-out-button";
@@ -19,6 +19,7 @@ export async function AdminHeader({ roles }: { roles: readonly RoleKey[] }) {
     { href: "/admin/saints", label: t("adminSaints.saints") },
     { href: "/admin/media", label: t("admin.nav.media") },
     { href: "/admin/sources", label: t("admin.nav.sources") },
+    ...(isPublisher(roles) ? [{ href: "/admin/notifications", label: t("admin.nav.announcements") }] : []),
     { href: "/admin/audit", label: t("admin.nav.audit") },
     ...(canManageUsers(roles) ? [{ href: "/admin/users", label: t("admin.users") }] : []),
   ];

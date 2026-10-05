@@ -220,6 +220,41 @@ app/[locale]/(public)/search  search page (header search icon); app/api/search: 
 - Every word must match; Tamil and English are normalised the same way (`normalize_search_text`) and use trigram
   indexes. Row level security applies, so only published content is found.
 
+## Notifications
+
+```text
+lib/notifications/compose.ts   what a reminder says: the chosen parts, in the reader's language (unit tested)
+lib/notifications/provider.ts  delivery behind an interface: Web Push (VAPID) or a log (development)
+lib/notifications/send.ts      one run of the job: due reminders (once per reader and local date), due announcements
+app/api/cron/notifications     the job's endpoint, called every 15 minutes with the CRON_SECRET
+components/preferences/reminder-settings.tsx   Settings › Daily reminder; public/sw.js shows notifications
+app/[locale]/(admin)/admin/notifications       announcements (content admins)
+```
+
+- **Daily reminder**: a signed-in reader picks a time, a time zone and the parts they want (today's Gospel, saint of
+  the day, the day's Rosary mysteries, a prayer for the hour). They get one notification a day, in the language they
+  use the app in, that opens the right page. Readers who allow notifications on a device subscribe it with Web Push;
+  their preferences and devices are their own rows (row level security).
+- **Announcements**: content admins schedule a notification (India time) for every reader with reminders on. It is
+  claimed (`scheduled → sending → sent`) so it goes out once.
+- **The job** runs with the service role: `due_reminders()` lists readers whose time falls in the window (across
+  midnight too) and who have a device and no delivery yet for their local date; each delivery is claimed in
+  `notification_deliveries` before sending, so overlapping or repeated runs never send twice. Devices the push
+  service reports as gone are removed.
+- **Signing out** stops push on that device and removes its subscription.
+- **Provider**: `NOTIFICATION_PROVIDER=log` prints messages; otherwise Web Push with the VAPID keys. Another service
+  (e.g. a native app push service) can implement `NotificationProvider`.
+
+### Setting up notifications
+
+1. Generate keys: `npx web-push generate-vapid-keys`. Set `NEXT_PUBLIC_VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY` and
+   `VAPID_SUBJECT` (a `mailto:` address), plus `SUPABASE_SERVICE_ROLE_KEY` and a random `CRON_SECRET`, in the
+   hosting environment (never in a `NEXT_PUBLIC_` variable except the public key).
+2. Schedule `GET /api/cron/notifications` every 15 minutes with `Authorization: Bearer $CRON_SECRET`. `vercel.json`
+   does this on Vercel (frequent cron jobs need a paid plan); otherwise use Supabase `pg_cron` + `pg_net`, or any
+   scheduler that can send the header.
+3. On iPhone, Web Push works once the app is added to the Home Screen (iOS 16.4+).
+
 ## Admin (content management)
 
 | Area            | What staff do                                                                     | Who                       |
