@@ -41,4 +41,9 @@ pnpm db:test      # database migrations + pgTAP tests (needs local PostgreSQL + 
 - Phase 8 (Rosary): done. Guided Rosary for all four sets of mysteries, today's set by weekday and season,
   bead counter, decade jumps, keyboard control, pause and resume on the device, Scripture links, original
   meditations, `/api/rosary/[set]` (and `/api/rosary/today`). Tamil mystery titles need review.
-- Next: Phase 9 (Saints).
+- Phase 9 (Saints): done. Saint of the Day (from the calendar, with feast-date fallback), 201 saint profiles
+  with Tamil names and titles from the calendar and original English biographies, search and month browsing,
+  profiles with feast, life span, patronage, related prayers and a link to the feast's readings; links from
+  Today and Home; staff admin; `/api/saints`, `/api/saints/today`, `/api/saints/search`, `/api/saints/[slug]`.
+  Tamil biographies and saint images still to be added.
+- Next: Phase 10 (personal features).

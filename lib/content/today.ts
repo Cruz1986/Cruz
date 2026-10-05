@@ -63,6 +63,7 @@ const daySchema = z.object({
         name_ta: z.string(),
         rank: z.string(),
         color: z.string(),
+        saints: z.object({ slug: z.string() }).nullable(),
       }),
     }),
   ),
@@ -84,6 +85,8 @@ export type DayCelebration = {
   kind: string;
   color: LiturgicalColor;
   isPrimary: boolean;
+  /** Profile of the saint this celebration honours, when published. */
+  saintSlug: string | null;
 };
 
 export type Today = {
@@ -106,7 +109,7 @@ export type Today = {
 const DAY_SELECT = `
   date, season, week_number, sunday_cycle, weekday_cycle, color, day_code, title_en, title_ta, kind,
   liturgical_calendars!inner(code),
-  liturgical_day_celebrations(is_primary, sort_order, celebrations(code, name_en, name_ta, rank, color)),
+  liturgical_day_celebrations(is_primary, sort_order, celebrations(code, name_en, name_ta, rank, color, saints(slug))),
   liturgical_day_masses(mass_key, role, sort_order, celebrations(code),
     lectionary_sets(code, lectionary_readings(reading_type, sequence, alt_group, is_short, is_proper, source_type, reference_display,
       lectionary_reading_ranges(seq, start_chapter, start_verse, start_part, end_chapter, end_verse, end_part, bible_books(code, canon_order)))))`;
@@ -166,6 +169,7 @@ export async function getLiturgicalDay(db: DbClient, calendar: CalendarCode, iso
       kind: c.celebrations.rank,
       color: c.celebrations.color as LiturgicalColor,
       isPrimary: c.is_primary,
+      saintSlug: c.celebrations.saints?.slug ?? null,
     }));
   const names = new Map(celebrations.map((c) => [c.code, c]));
 

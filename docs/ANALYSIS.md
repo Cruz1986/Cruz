@@ -3,7 +3,7 @@
 Response to the "First action — no coding" step of the master prompt in [PRD.md](./PRD.md) §22.
 No application code has been written. Implementation starts only after this plan is approved.
 
-Status: **approved 2026-10-05** · Phases 1–8 implemented
+Status: **approved 2026-10-05** · Phases 1–9 implemented
 
 ---
 
@@ -371,3 +371,4 @@ Defaults apply until you say otherwise. Data sources are evaluated in [CONTENT_R
 | Admin CMS for the Bible in Phase 11                       | Phase 4 adds a read-only Admin → Bible page with staff preview                                                             | Staff need to see the Tamil text while it can't be public                               |
 | `liturgical_days` as the only per-day data                | Days also store the engine's day code, titles, precedence and kind; Masses link reading sets with a role (base / memorial) | Today renders from one query; memorial propers are applied when the page is built       |
 | Lectionary texts in `lectionary_texts`                    | Not imported. Readings show Bible passages by verse range, labelled with the translation                                   | The Lectionary wording is licensed separately                                           |
+| Saint of the Day from `saints` feast dates                | From the celebrations the calendar keeps that day (`celebrations.saint_id`), then saints whose feast falls on the date     | Follows transferred and impeded celebrations; shared feasts (Peter and Paul) show both  |

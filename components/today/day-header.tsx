@@ -22,6 +22,7 @@ export async function DayHeader({ day, headingLevel = 1 }: { day: Today; heading
   const date = parseIsoDate(day.date)!;
   const Heading = headingLevel === 1 ? "h1" : "h2";
   const others = day.celebrations.filter((c) => !c.isPrimary);
+  const primarySaint = day.celebrations.find((c) => c.isPrimary)?.saintSlug ?? null;
 
   return (
     <header className="space-y-3">
@@ -39,6 +40,15 @@ export async function DayHeader({ day, headingLevel = 1 }: { day: Today; heading
         </span>
         <span>{t("cycles", { sunday: day.sundayCycle, weekday: day.weekdayCycle })}</span>
       </div>
+      {primarySaint ? (
+        <Link
+          href={`/saints/${primarySaint}`}
+          className="text-accent inline-flex min-h-10 items-center gap-1 text-sm font-medium hover:underline"
+        >
+          {t("aboutSaint")}
+          <ChevronRight aria-hidden className="size-4" />
+        </Link>
+      ) : null}
       {others.length ? (
         <div className="text-sm">
           <span className="text-fg font-medium">{t("alsoToday")}: </span>
@@ -46,7 +56,16 @@ export async function DayHeader({ day, headingLevel = 1 }: { day: Today; heading
             {others.map((c, i) => (
               <span key={c.code}>
                 {i > 0 ? " · " : null}
-                {locale === "ta" ? c.nameTa : c.nameEn} ({t(`kind.${c.kind}` as "kind.memorial")})
+                {c.saintSlug ? (
+                  <Link href={`/saints/${c.saintSlug}`} className="text-accent hover:underline">
+                    {locale === "ta" ? c.nameTa : c.nameEn}
+                  </Link>
+                ) : locale === "ta" ? (
+                  c.nameTa
+                ) : (
+                  c.nameEn
+                )}{" "}
+                ({t(`kind.${c.kind}` as "kind.memorial")})
               </span>
             ))}
           </span>

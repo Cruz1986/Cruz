@@ -80,6 +80,18 @@ pnpm calendar:generate --calendar in --from 2025 --to 2030
 - Reading text on the Today page comes from the published Bible translation in the reader's language, falling
   back to another published one, and is labelled with its source. The official Lectionary wording is not stored.
 
+## Saints
+
+```bash
+pnpm import:saints --path data/import/saints/saints.json --publish
+```
+
+Run it after the calendar and the prayers. `data/import/saints/saints.json` holds 201 saints: names, titles and
+feast dates taken from the calendar's celebrations (Tamil and English), short English biographies written for this
+project, and the celebrations and prayers each saint is linked to. Saints are upserted by slug and only the fields
+in the file are written, so Tamil biographies added in the admin survive a re-import (unless the file gains one).
+Regenerating the calendar keeps the links between celebrations and saints.
+
 ## Local development database
 
 ```bash

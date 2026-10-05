@@ -300,7 +300,8 @@
     "unavailable": "The liturgical calendar is not available yet.",
     "unavailableBody": "Daily readings appear here once the calendar has been generated.",
     "openToday": "Today's readings",
-    "dateHeading": "Readings for {date}"
+    "dateHeading": "Readings for {date}",
+    "aboutSaint": "About this saint"
   },
   "calendar": {
     "previousMonth": "Previous month",
@@ -417,5 +418,58 @@
     "jumpToDecade": "Go to decade {decade}",
     "prayerMissing": "This prayer is not available in your language yet.",
     "source": "Meditations: {attribution}"
+  },
+  "saints": {
+    "ofTheDay": "Saint of the Day",
+    "ofTheDayMany": "Saints of the Day",
+    "noneToday": "The calendar keeps no saint's day today.",
+    "search": "Search saints",
+    "searchPlaceholder": "Name, title or patronage",
+    "noResults": "No saints match “{query}”.",
+    "count": "{count, plural, one {# saint} other {# saints}}",
+    "months": "Months",
+    "feast": "Feast: {date}",
+    "readingsOfFeast": "Readings for {date}",
+    "patronage": "Patron of {patronage}",
+    "biography": "Life",
+    "tamilPending": "A Tamil biography is being prepared. The English text is shown.",
+    "englishMissing": "No English biography yet.",
+    "biographyPending": "A biography is being written.",
+    "prayers": "Prayers",
+    "sameDay": "Also remembered on this day",
+    "source": "Biography: {attribution}",
+    "imageCredit": "Image: {attribution}",
+    "readMore": "Read more",
+    "allSaints": "All saints",
+    "unavailable": "Saints are not available yet.",
+    "unavailableBody": "Saint profiles will appear here once they are added."
+  },
+  "adminSaints": {
+    "saints": "Saints",
+    "newSaint": "New saint",
+    "editSaint": "Edit saint",
+    "noSaints": "No saints yet.",
+    "slugTaken": "That address is already used by another saint.",
+    "form": {
+      "name": "Name",
+      "title": "Titles (e.g. bishop and doctor)",
+      "patronage": "Patron of",
+      "biography": "Biography",
+      "biographyHelp": "Plain text. Leave a blank line between paragraphs. Write in your own words; never copy from websites or books.",
+      "slugHelp": "Lower-case letters, numbers and hyphens, e.g. francis-xavier.",
+      "feast": "Feast day",
+      "feastMonth": "Feast month",
+      "feastDay": "Feast day of the month",
+      "born": "Year of birth",
+      "died": "Year of death",
+      "delete": "Delete saint"
+    },
+    "fieldError": {
+      "feast_incomplete": "Give both the month and the day, or neither.",
+      "feast_invalid": "That day does not exist in this month.",
+      "years_order": "The year of death must not be before the year of birth.",
+      "biography_required": "Add a biography in at least one language before publishing.",
+      "invalid": "Check this field."
+    }
   }
 }

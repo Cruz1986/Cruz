@@ -87,6 +87,15 @@ chapter × 1 000 + verse`) in the reference versification, which is the Tamil co
 - `lectionary_readings.source_type` keeps the original type code; `reading_type`, `sequence`, `alt_group` and
   `is_short` are decoded from it.
 
+## Saints model
+
+- `saints`: names and titles (`title_en`, `title_ta`, e.g. "bishop and doctor") in both languages, fixed feast date,
+  years, patronage, biographies, optional image (`media`), source and workflow status. `search_norm` covers names,
+  titles and patronage.
+- `celebrations.saint_id` links calendar celebrations to the saint they honour; several celebrations may share a
+  saint (Saint John the Baptist's birth and martyrdom).
+- `saint_prayers` links saints to prayers in the library.
+
 ## Content-table checklist
 
 A new publishable table needs `id`, `source_id`, `status`, `published_at`, `created_by`, `updated_by`,

@@ -129,6 +129,23 @@ app/api/rosary/[set]          JSON API (`today` for today's set)
   prayer for screen readers. Arrow keys and the space bar move between prayers.
 - Prayers come from the prayer library, so a Tamil text added there appears in the Rosary too.
 
+## Saints
+
+```text
+lib/saints/helpers.ts         feast dates, life spans, search, the saints of a day (unit tested)
+lib/content/saints.ts         saints, one saint with image and prayers, the saints of a date
+app/[locale]/(public)/saints  Saint of the Day and every saint by month with instant search
+app/[locale]/(public)/saints/[slug]  profile: feast, years, patronage, life, prayers, readings of the feast
+app/[locale]/(admin)/admin/saints    list, create, edit, review, publish, delete
+app/api/saints[/today|/search|/slug] JSON API
+```
+
+- The saints of a day are those whose celebrations the calendar keeps that day (`celebrations.saint_id`), then
+  any other saint whose feast falls on that date (so Saint Paul appears on 29 June beside Saint Peter).
+- The Today page and the home card link each celebration to its saint when the profile is published.
+- Images come from the `media` table (Supabase storage bucket `media`) with alt text and attribution; uploading
+  arrives with the admin CMS (Phase 11).
+
 ## Authentication and roles
 
 ```text

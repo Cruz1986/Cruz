@@ -12,6 +12,8 @@ import { buttonClasses } from "@/components/ui/button";
 import { LiturgicalColorBadge } from "@/components/ui/liturgical-color-badge";
 import { NAV_ITEMS } from "@/components/layout/nav-items";
 import { TodayDate } from "@/components/home/today-date";
+import { publicSaints } from "@/lib/content/saints";
+import { saintName, saintTitle } from "@/lib/saints/helpers";
 
 // The Today card follows the date in India; refreshed every few minutes.
 export const revalidate = 300;
@@ -23,7 +25,11 @@ export default async function HomePage({ params }: LocaleParams) {
   const locale = await initPage(params);
   const t = await getTranslations();
   const date = toIso(todayIn(DEFAULT_TIME_ZONE));
-  const [day, books] = await Promise.all([publicToday(DEFAULT_CALENDAR, date, locale), allBooks()]);
+  const [day, books, saints] = await Promise.all([
+    publicToday(DEFAULT_CALENDAR, date, locale),
+    allBooks(),
+    publicSaints.ofDay(DEFAULT_CALENDAR, date),
+  ]);
   const SaintIcon = NAV_ITEMS.saints.icon;
 
   const mass = day?.masses.find((m) => m.key === "day") ?? day?.masses.at(-1);
@@ -39,7 +45,6 @@ export default async function HomePage({ params }: LocaleParams) {
     gospel && day
       ? vkeyRanges(gospel.ranges, day.canonOrder).flatMap(([a, b]) => day.passages.get(`${a}-${b}`) ?? [])
       : [];
-  const memorials = day?.celebrations.filter((c) => !c.isPrimary) ?? [];
 
   return (
     <div className="space-y-6">
@@ -99,19 +104,21 @@ export default async function HomePage({ params }: LocaleParams) {
             <SaintIcon aria-hidden className="text-gold size-5" />
             {t("home.saintOfDay")}
           </CardTitle>
-          {memorials.length ? (
-            <ul className="mt-3 space-y-1">
-              {memorials.map((c) => (
-                <li key={c.code} className="text-fg">
-                  {locale === "ta" ? c.nameTa : c.nameEn}
-                  <span className="text-fg-muted text-sm"> · {t(`today.kind.${c.kind}` as "today.kind.memorial")}</span>
+          {saints.length ? (
+            <ul className="mt-3 space-y-2">
+              {saints.map((s) => (
+                <li key={s.slug}>
+                  <Link href={`/saints/${s.slug}`} className="text-fg hover:text-accent font-medium">
+                    {saintName(s, locale)}
+                  </Link>
+                  {saintTitle(s, locale) ? (
+                    <span className="text-fg-muted block text-sm">{saintTitle(s, locale)}</span>
+                  ) : null}
                 </li>
               ))}
             </ul>
-          ) : day?.celebrations[0] && day.kind !== "weekday" && day.kind !== "sunday" ? (
-            <p className="text-fg mt-3">{locale === "ta" ? day.titleTa : day.titleEn}</p>
           ) : (
-            <p className="text-fg-muted mt-3">{t("states.comingSoonBody")}</p>
+            <p className="text-fg-muted mt-3">{t("saints.noneToday")}</p>
           )}
           <Link
             href={NAV_ITEMS.saints.href}

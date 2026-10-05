@@ -42,6 +42,11 @@ Other sources:
 Prayers in the library are traditional public-domain English texts. The Rosary's mystery titles, fruits and
 meditations (`data/import/rosary/rosary.json`) were written for this project; only Scripture references are cited.
 
+Saint names, titles and feast dates come from the calendar data. Saint biographies
+(`data/import/saints/saints.json`) were written for this project and should be checked by an editor; editors writing
+Tamil biographies must use their own words. Saint images must be public domain or openly licensed, with the
+attribution stored in `media`.
+
 ## Other planned sources
 
 | Content                                      | Plan                                                                |
