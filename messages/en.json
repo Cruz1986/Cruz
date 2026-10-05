@@ -301,5 +301,19 @@
     "unavailableBody": "Daily readings appear here once the calendar has been generated.",
     "openToday": "Today's readings",
     "dateHeading": "Readings for {date}"
+  },
+  "calendar": {
+    "previousMonth": "Previous month",
+    "nextMonth": "Next month",
+    "thisMonth": "This month",
+    "monthTitle": "{month}",
+    "notGenerated": "This month has not been added to the calendar yet.",
+    "notGeneratedBody": "The calendar is generated a few years at a time.",
+    "legend": "Liturgical colours",
+    "legendNote": "Bold days are solemnities; feasts are marked ◆.",
+    "today": "Today",
+    "seasonStarts": "{season} begins",
+    "dayLink": "{date}: {title}",
+    "feastMark": "Feast"
   }
 }

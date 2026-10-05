@@ -33,4 +33,6 @@ pnpm db:test      # database migrations + pgTAP tests (needs local PostgreSQL + 
   the Tamil Bible is imported for staff preview only until permission is confirmed.
 - Phase 5 (Today): done. Liturgical calendar engine (General Roman + India), daily readings with alternatives,
   vigils and memorial propers, passage text, day navigation, home page Today card, `/api/today`.
-- Next: Phase 6 (liturgical calendar month view).
+- Phase 6 (calendar): done. Month view with liturgical colours, ranks, memorials and season changes, month
+  navigation, links to each day's readings, `/api/calendar`.
+- Next: Phase 7 (prayer library).

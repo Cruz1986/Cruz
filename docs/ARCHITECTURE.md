@@ -82,6 +82,9 @@ scripts/calendar/         writes generated years into liturgical_days (admins ca
 app/[locale]/(public)/today      today (rendered for India's date; the browser moves to the reader's own date)
 app/[locale]/(public)/today/[date]  any day, incrementally static
 app/api/today             JSON API
+lib/content/calendar.ts   a month of generated days with memorials
+app/[locale]/(public)/calendar[/YYYY-MM]  month view (grid on wide screens, list on phones), days link to Today
+app/api/calendar          JSON API (?month=YYYY-MM)
 ```
 
 - The default calendar is the General Roman Calendar with India's proper calendar (`in`): Epiphany, Ascension
