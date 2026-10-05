@@ -13,6 +13,7 @@ import { PageHeader } from "@/components/ui/page-header";
 import { EmptyState } from "@/components/ui/empty-state";
 import { Button, buttonClasses } from "@/components/ui/button";
 import { bookAbbr } from "@/components/bible/book-name";
+import { Highlighted } from "@/components/ui/highlighted";
 
 type Props = {
   params: Promise<{ locale: string }>;
@@ -24,26 +25,6 @@ const one = (v: string | string[] | undefined) => (typeof v === "string" ? v : "
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("bible");
   return { title: t("search"), robots: { index: false } };
-}
-
-/** Highlights each query word in a verse (case-insensitive, Unicode-normalised). */
-function Highlighted({ text, words }: { text: string; words: string[] }) {
-  const flat = text.replace(/\n/g, " ").normalize("NFC");
-  if (!words.length) return <>{flat}</>;
-  const pattern = new RegExp(`(${words.map((w) => w.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")).join("|")})`, "giu");
-  return (
-    <>
-      {flat.split(pattern).map((part, i) =>
-        i % 2 ? (
-          <mark key={i} className="bg-gold/25 text-fg rounded px-0.5">
-            {part}
-          </mark>
-        ) : (
-          part
-        ),
-      )}
-    </>
-  );
 }
 
 export default async function BibleSearchPage({ params, searchParams }: Props) {

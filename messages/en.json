@@ -24,7 +24,8 @@
     "credits": "Sources & credits",
     "account": "Account",
     "admin": "Admin",
-    "library": "My library"
+    "library": "My library",
+    "search": "Search"
   },
   "home": {
     "todayLabel": "Today",
@@ -83,6 +84,10 @@
     "library": {
       "title": "My library",
       "description": "Your bookmarks, highlights, notes, favourites and history."
+    },
+    "search": {
+      "title": "Search",
+      "description": "Bible, prayers, saints, the calendar and readings."
     }
   },
   "states": {
@@ -742,5 +747,24 @@
     "usedBy": "Used by",
     "notUsed": "Not used yet.",
     "deleteHelp": "Deleting removes the file; saints using it lose their image."
+  },
+  "search": {
+    "label": "Search",
+    "placeholder": "A word, a name or a reference like John 3:16",
+    "submit": "Search",
+    "hint": "Search the Bible, prayers, saints, the Rosary, reflections and the calendar. Try a name (Thomas), a word (mercy) or a reference (Jn 3:16).",
+    "tooShort": "Type at least two letters.",
+    "none": "Nothing found for “{query}”.",
+    "goTo": "Open {reference}",
+    "readAtMass": "Read at Mass",
+    "bible": "Bible",
+    "moreBible": "More in the Bible",
+    "prayers": "Prayers",
+    "saints": "Saints",
+    "rosary": "Rosary",
+    "reflections": "Reflections",
+    "celebrations": "Calendar",
+    "next": "Next: {date}",
+    "results": "{count, plural, one {# result} other {# results}}"
   }
 }

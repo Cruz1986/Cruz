@@ -1,4 +1,5 @@
 import { useTranslations } from "next-intl";
+import { Search } from "lucide-react";
 import { Link } from "@/lib/i18n/navigation";
 import { HEADER_NAV, NAV_ITEMS } from "./nav-items";
 import { NavLink } from "./nav-link";
@@ -35,6 +36,13 @@ export function SiteHeader() {
           </ul>
         </nav>
 
+        <Link
+          href="/search"
+          aria-label={t("nav.search")}
+          className="text-fg-muted hover:bg-surface-muted hover:text-fg inline-flex size-10 shrink-0 items-center justify-center rounded-full"
+        >
+          <Search aria-hidden className="size-5" />
+        </Link>
         <LanguageSwitcher />
         <Link
           href={NAV_ITEMS.library.href}

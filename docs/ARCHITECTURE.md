@@ -204,6 +204,22 @@ lib/admin/*         admin server actions: check the role first, then run as the 
 
 6. The migrations create a public Storage bucket `media` (images up to 15 MB) with upload rights for staff.
 
+## Search
+
+```text
+lib/search/snippet.ts         query words, snippets around a match, verse keys of a reference (unit tested)
+lib/content/search.ts         siteSearch(): reference + Masses where it is read, verses, all published content
+app/[locale]/(public)/search  search page (header search icon); app/api/search: JSON
+```
+
+- A query that is a Bible reference ("Jn 3:16", "யோவா 3:16", "Ps 23") opens the passage and lists the upcoming
+  days whose Mass readings include it (`days_with_passage`). Common lectionary abbreviations are book aliases.
+- Other queries search verses in the reader's translation (`search_bible`, with "More in the Bible" for paging) and,
+  in one call (`search_content`), prayers (texts too), saints (biographies too), Rosary mysteries, reflections and
+  the celebrations the calendar keeps, with the next day each falls on.
+- Every word must match; Tamil and English are normalised the same way (`normalize_search_text`) and use trigram
+  indexes. Row level security applies, so only published content is found.
+
 ## Admin (content management)
 
 | Area            | What staff do                                                                     | Who                       |

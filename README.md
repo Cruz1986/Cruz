@@ -54,4 +54,7 @@ pnpm db:test      # database migrations + pgTAP tests (needs local PostgreSQL + 
   celebrations and reading references (kept on re-import), daily reflections (shown on Today), Rosary mysteries,
   Bible translations and book names, media uploads with alt text and credit (saint images), sources and
   licences, and a change history with field-by-field differences.
-- Next: Phase 12 (search).
+- Phase 12 (search): done. One search for the Bible (references open the passage and list the upcoming Masses
+  where it is read; words find verses), prayers, saints, Rosary mysteries, reflections and calendar
+  celebrations with their next date, in Tamil and English; `/api/search`.
+- Next: Phase 13 (notifications).

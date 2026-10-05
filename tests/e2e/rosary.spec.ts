@@ -59,6 +59,11 @@ test.describe("rosary with data", () => {
     await expect(page.getByRole("heading", { level: 2 }).first()).toHaveAttribute("lang", "ta");
   });
 
+  test("unknown mystery sets are not found", async ({ page }) => {
+    const response = await page.goto("/en/rosary/nope");
+    expect(response?.status()).toBe(404);
+  });
+
   test("the API returns today's mysteries", async ({ request }) => {
     const body = await (await request.get("/api/rosary/today")).json();
     expect(["joyful", "luminous", "sorrowful", "glorious"]).toContain(body.set.key);

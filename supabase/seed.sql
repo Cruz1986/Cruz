@@ -565,6 +565,33 @@ from (values
 join public.bible_books b on b.code = v.code
 on conflict (language, alias_norm) do nothing;
 
+-- Also in migration 20261005001300 (for databases seeded before it). References typed in search: every book's own abbreviations, plus the short forms common in English
+-- lectionaries and missals (Jn 3:16, Mt 5, Is 9:1, Ps 23).
+insert into public.bible_book_names (book_id, language, alias)
+select id, 'en', abbr_en from public.bible_books
+union
+select id, 'ta', abbr_ta from public.bible_books
+on conflict (language, alias_norm) do nothing;
+
+insert into public.bible_book_names (book_id, language, alias)
+select b.id, 'en', a.alias
+from (values
+  ('GEN', 'Gn'), ('EXO', 'Ex'), ('LEV', 'Lv'), ('NUM', 'Nm'), ('DEU', 'Dt'), ('JOS', 'Jos'), ('JDG', 'Jgs'),
+  ('RUT', 'Ru'), ('1SA', '1 Sm'), ('2SA', '2 Sm'), ('1KI', '1 Kgs'), ('2KI', '2 Kgs'), ('1CH', '1 Chr'),
+  ('2CH', '2 Chr'), ('NEH', 'Neh'), ('TOB', 'Tb'), ('JDT', 'Jdt'), ('EST', 'Est'), ('1MA', '1 Mc'), ('2MA', '2 Mc'),
+  ('PSA', 'Pss'), ('PSA', 'Psalm'), ('PRO', 'Prv'), ('ECC', 'Eccl'), ('ECC', 'Qoh'), ('SNG', 'Sg'), ('WIS', 'Ws'),
+  ('SIR', 'Sir'), ('ISA', 'Is'), ('JER', 'Jer'), ('LAM', 'Lam'), ('BAR', 'Bar'), ('EZK', 'Ez'), ('DAN', 'Dn'),
+  ('HOS', 'Hos'), ('JOL', 'Jl'), ('AMO', 'Am'), ('OBA', 'Ob'), ('JON', 'Jon'), ('MIC', 'Mi'), ('NAM', 'Na'),
+  ('HAB', 'Hb'), ('ZEP', 'Zep'), ('HAG', 'Hg'), ('ZEC', 'Zec'), ('MAL', 'Mal'), ('MAT', 'Mt'), ('MRK', 'Mk'),
+  ('LUK', 'Lk'), ('JHN', 'Jn'), ('ACT', 'Acts'), ('ROM', 'Rom'), ('1CO', '1 Cor'), ('2CO', '2 Cor'), ('GAL', 'Gal'),
+  ('EPH', 'Eph'), ('PHP', 'Phil'), ('COL', 'Col'), ('1TH', '1 Thes'), ('2TH', '2 Thes'), ('1TI', '1 Tm'),
+  ('2TI', '2 Tm'), ('TIT', 'Ti'), ('PHM', 'Phlm'), ('HEB', 'Heb'), ('JAS', 'Jas'), ('1PE', '1 Pt'), ('2PE', '2 Pt'),
+  ('1JN', '1 Jn'), ('2JN', '2 Jn'), ('3JN', '3 Jn'), ('JUD', 'Jude'), ('REV', 'Rv')
+) as a (code, alias)
+join public.bible_books b on b.code = a.code
+on conflict (language, alias_norm) do nothing;
+
+
 -- Prayer categories (taxonomy only; prayer texts are imported, see docs/IMPORT.md).
 insert into public.prayer_categories (slug, name_en, name_ta, sort_order) values
   ('essential', 'Essential prayers', 'அடிப்படைச் செபங்கள்', 1),

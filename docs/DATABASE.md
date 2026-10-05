@@ -107,6 +107,15 @@ chapter × 1 000 + verse`) in the reference versification, which is the Tamil co
 - `history`: chapters, prayers and saints opened; a trigger keeps the latest 200 per user.
 - Owner-only RLS on every table; the browser writes them directly with the reader's own session.
 
+## Search
+
+- `search_norm` (normalised Tamil + English text, trigram-indexed) on prayers, saints, reflections, celebrations and
+  Rosary mysteries; `bible_verses.text_norm` for Scripture.
+- `search_content(query, from, calendar, limit)`: one call across that content; every word must match, title matches
+  first, security invoker (published content only for the public).
+- `days_with_passage(start, end, from, calendar, limit)`: upcoming days whose readings overlap a range of canonical
+  verse keys.
+
 ## Admin support
 
 - `celebrations.names_locked`, `lectionary_readings.is_edited`: set by the admin; the calendar generator and the

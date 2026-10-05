@@ -14,7 +14,8 @@ const SETS: MysterySetKey[] = ["joyful", "luminous", "sorrowful", "glorious"];
 export function generateStaticParams() {
   return SETS.map((set) => ({ set }));
 }
-export const dynamicParams = false;
+// Not `dynamicParams = false`: with it, Next 16 answers 404 for these pages after a site-wide revalidation.
+// Unknown sets are rejected below.
 
 type Props = { params: Promise<{ locale: string; set: string }> };
 
@@ -28,6 +29,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 export default async function RosarySetPage({ params }: Props) {
   const locale = await initPage(params);
   const { set } = await params;
+  if (!SETS.includes(set as MysterySetKey)) notFound();
   const data = await publicRosary();
   const found = data?.sets.find((s) => s.key === set);
   if (!data || !found) notFound();
