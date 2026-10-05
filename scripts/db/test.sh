@@ -11,18 +11,7 @@ cd "$(dirname "$0")/../.."
 TEST_DB="${TEST_DB:-app_test}"
 PSQL=(psql -X -q -v ON_ERROR_STOP=1 -o /dev/null)
 
-dropdb --if-exists "$TEST_DB"
-createdb "$TEST_DB"
-# Same default search_path as Supabase.
-"${PSQL[@]}" -d postgres -c "alter database \"$TEST_DB\" set search_path = \"\$user\", public, extensions"
-
-"${PSQL[@]}" -d "$TEST_DB" -f supabase/tests/support/supabase_shim.sql
-for migration in supabase/migrations/*.sql; do
-  echo "migrate: $migration"
-  "${PSQL[@]}" -d "$TEST_DB" -f "$migration"
-done
-echo "seed: supabase/seed.sql"
-"${PSQL[@]}" -d "$TEST_DB" -f supabase/seed.sql
+scripts/db/setup-local.sh "$TEST_DB"
 # Seed must be idempotent.
 "${PSQL[@]}" -d "$TEST_DB" -f supabase/seed.sql
 

@@ -13,7 +13,8 @@
     "format:check": "prettier --check .",
     "check": "pnpm lint && pnpm typecheck && pnpm test && pnpm format:check",
     "db:test": "scripts/db/test.sh",
-    "test:e2e": "playwright test"
+    "test:e2e": "playwright test",
+    "import:bible": "tsx scripts/import/bible.ts"
   },
   "dependencies": {
     "@supabase/ssr": "^0.12.7",
@@ -36,9 +37,11 @@
     "@types/react-dom": "^19",
     "eslint": "^9",
     "eslint-config-next": "16.3.8",
+    "postgres": "^3.4.9",
     "prettier": "^3.9.9",
     "prettier-plugin-tailwindcss": "^0.8.1",
     "tailwindcss": "^4",
+    "tsx": "^4.23.15",
     "typescript": "^5",
     "vitest": "^5.0.3"
   },

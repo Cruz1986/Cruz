@@ -7,6 +7,7 @@ A Tamil-first, English-supported Catholic platform: Bible, daily readings, litur
 - Architecture: [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)
 - Database: [docs/DATABASE.md](docs/DATABASE.md)
 - Content rights: [docs/CONTENT_RIGHTS.md](docs/CONTENT_RIGHTS.md)
+- Importing content: [docs/IMPORT.md](docs/IMPORT.md)
 
 ## Getting started
 
@@ -27,4 +28,7 @@ pnpm db:test      # database migrations + pgTAP tests (needs local PostgreSQL + 
 - Phase 3 (authentication and roles): done. Email-link and Google sign-in via Supabase, role-protected admin
   area, user and role management. To switch it on, see the Supabase setup steps in
   [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md#setting-up-supabase).
-- Next: Phase 4 (Bible).
+- Phase 4 (Bible): done. Book and chapter navigation, reader (Tamil typography, poetry, headings), side-by-side
+  view, verse copy and share, search by words or reference, JSON API, import pipeline. Douay-Rheims is public;
+  the Tamil Bible is imported for staff preview only until permission is confirmed.
+- Next: Phase 5 (Today / daily readings).

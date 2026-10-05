@@ -47,6 +47,27 @@ proxy.ts                    # next-intl locale negotiation (Next 16 "proxy", for
   A language the reader chose before is remembered by next-intl's locale cookie.
 - **No sample content.** Modules show honest empty states until their data layer exists (PRD: content is data).
 
+## Bible
+
+```text
+lib/content/bible.ts         data access (takes a client: anonymous for public pages, signed-in for staff preview)
+lib/content/public-bible.ts  request-memoised published content for pages
+lib/bible/                   reference parser ("John 3:16", "யோவா 3:16"), URL helpers, text normalisation
+components/bible/            book list, chapter text (prose / poetry / headings), parallel view, verse selection,
+                             reading position, reading-size control
+app/[locale]/(public)/bible  /bible, /bible/<translation>, /<book>, /<chapter>, /<chapter>/<other translation>, /search
+app/api/bible/*              JSON API (books, chapter, search)
+scripts/import/              Bible importers (see IMPORT.md)
+```
+
+- Reader pages are **incrementally static**: generated on first visit, cached, refreshed hourly
+  (`revalidate = 3600`). Every layout and page calls `setRequestLocale` (via `initPage`), which static rendering needs.
+- Search and admin pages are dynamic. Search needs every word (substring match, so it works for Tamil) and can
+  also take a reference ("John 3:16" jumps to the verse).
+- Verse selection (tap to select, copy, share, copy link) is a client island over server-rendered text. The last
+  chapter read is remembered on the device. Bookmarks, highlights and notes come with accounts in Phase 10.
+- Staff can preview unpublished translations under Admin → Bible.
+
 ## Authentication and roles
 
 ```text

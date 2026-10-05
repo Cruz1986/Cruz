@@ -3,7 +3,7 @@
 Response to the "First action — no coding" step of the master prompt in [PRD.md](./PRD.md) §22.
 No application code has been written. Implementation starts only after this plan is approved.
 
-Status: **approved 2026-10-05** · Phases 1–2 implemented
+Status: **approved 2026-10-05** · Phases 1–4 implemented
 
 ---
 
@@ -360,10 +360,12 @@ Defaults apply until you say otherwise. Data sources are evaluated in [CONTENT_R
 
 ## Changes made during implementation
 
-| Planned (§J)                      | Built (Phase 2)                                                                        | Why                                                                                |
-| --------------------------------- | -------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------- |
-| `content_revisions` table         | `content_audit_log` stores before/after of every change and serves as revision history | One mechanism instead of two                                                       |
-| `bible_books` = 73 books          | 73 + `ESG` / `DAG` supplements, and per-translation order in `bible_translation_books` | The Tamil Bible prints the Greek additions as separate books, in a different order |
-| `canonical_key` text              | `canonical_vkey` integer                                                               | Compact, and verse ranges become simple `between` queries                          |
-| `reflections.day_id`              | `reflections.reflection_date`                                                          | Regenerating calendar days must never orphan reflections                           |
-| `rosary_steps.prayer_id` required | Nullable: a step without a prayer means "announce the mystery"                         | The guided flow needs that step                                                    |
+| Planned (§J)                                              | Built (Phase 2)                                                                        | Why                                                                                     |
+| --------------------------------------------------------- | -------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------- |
+| `content_revisions` table                                 | `content_audit_log` stores before/after of every change and serves as revision history | One mechanism instead of two                                                            |
+| `bible_books` = 73 books                                  | 73 + `ESG` / `DAG` supplements, and per-translation order in `bible_translation_books` | The Tamil Bible prints the Greek additions as separate books, in a different order      |
+| `canonical_key` text                                      | `canonical_vkey` integer                                                               | Compact, and verse ranges become simple `between` queries                               |
+| `reflections.day_id`                                      | `reflections.reflection_date`                                                          | Regenerating calendar days must never orphan reflections                                |
+| `rosary_steps.prayer_id` required                         | Nullable: a step without a prayer means "announce the mystery"                         | The guided flow needs that step                                                         |
+| Reference versification "as NABRE" (Hebrew verse numbers) | The Tamil common-language Bible's numbering (English-style)                            | The primary translation then needs no mapping; only Douay-Rheims (Vulgate) is converted |
+| Admin CMS for the Bible in Phase 11                       | Phase 4 adds a read-only Admin → Bible page with staff preview                         | Staff need to see the Tamil text while it can't be public                               |

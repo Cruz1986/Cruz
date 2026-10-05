@@ -1,8 +1,17 @@
 import type { ReactNode } from "react";
+import { initPage } from "@/lib/i18n/page";
 import { SiteHeader } from "@/components/layout/site-header";
 import { BottomNav } from "@/components/layout/bottom-nav";
 
-export default function PublicLayout({ children }: { children: ReactNode }) {
+export default async function PublicLayout({
+  children,
+  params,
+}: {
+  children: ReactNode;
+  params: Promise<{ locale: string }>;
+}) {
+  // Every layout and page must set the locale itself (they render in parallel) to stay static.
+  await initPage(params);
   return (
     <>
       <SiteHeader />

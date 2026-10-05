@@ -62,11 +62,17 @@ Enforced in the database, not only in the UI:
 - **Books.** `bible_books` is one master list in Catholic canon order (73 books), plus `ESG` / `DAG` for the
   Greek additions to Esther and Daniel. Some translations, including the Tamil common-language Bible, print
   these as separate books. Each translation's own book order lives in `bible_translation_books`.
-- **Verse keys.** A verse is stored in its translation's own numbering (`book, chapter, verse, verse_part`). It
-  also gets a `canonical_vkey` (`canon_order × 1 000 000 + chapter × 1 000 + verse`) in the reference
-  versification: Hebrew-numbered Psalms, Joel 4 chapters, Malachi 3, Daniel 14. `versification_maps` holds the
-  differences. Parallel view, lectionary ranges and highlights all use the canonical key.
-- **Search.** `text_norm` is NFC-normalised, lower-cased text with zero-width characters removed. It has a
+- **Verse keys.** A verse is stored in its translation's own numbering (`book, chapter, verse, verse_part`, with
+  chapter 0 for prologues such as Sirach's). It also gets a `canonical_vkey` (`canon_order × 1 000 000 +
+chapter × 1 000 + verse`) in the reference versification, which is the Tamil common-language Bible's numbering:
+  Hebrew psalm numbers with titles as verse 0, Joel 3 chapters, Malachi 4 chapters, and the Greek additions in
+  `ESG` / `DAG`. Importers convert other schemes (e.g. the Vulgate numbering of Douay-Rheims). The parallel view
+  aligns translations by this key.
+- **Layout.** Verse text is plain text with `
+` between poetry lines; `is_poetry`, `paragraph_end` and
+  `verse_label` (e.g. "4-5" for merged verses) carry the rest. Headings live in `bible_section_headings`.
+- **Search.** `search_bible(translation, query, limit, after)` requires every word (substring match, so it
+  works for Tamil without a stemmer) and pages by a stable sort key. `text_norm` is NFC-normalised, lower-cased text with zero-width characters removed. It has a
   trigram index for substring and Tamil search. `tsv` is a `simple` full-text vector.
 
 ## Content-table checklist

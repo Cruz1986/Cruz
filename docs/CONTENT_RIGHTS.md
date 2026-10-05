@@ -25,6 +25,19 @@ Source: [github.com/jayarathina](https://github.com/jayarathina) (reviewed 2026-
 | Tamil-Bible-OSIS          | Same Bible in OSIS / SWORD format                                                               | None stated  | As above                                                                    | Not needed                                                                           |
 | Tamil-Breviary            | Liturgy of the Hours: psalms, hymns, antiphons, intercessions, prayers (partial)                | None         | Published liturgical text; no licence at all                                | **Do not use.** Out of PRD scope; revisit for V2+ with permission                    |
 
+Other sources:
+
+| Source                                                                                | Content                                          | Decision                                                                       |
+| ------------------------------------------------------------------------------------- | ------------------------------------------------ | ------------------------------------------------------------------------------ |
+| [scrollmapper/bible_databases](https://github.com/scrollmapper/bible_databases) `DRC` | Douay-Rheims Bible, Challoner revision (1749–52) | **Use, published.** Public domain. Recorded as a verified public-domain source |
+
+## Status of imported content
+
+| Translation                  | Imported | Public | Why                                                       |
+| ---------------------------- | -------- | ------ | --------------------------------------------------------- |
+| Douay-Rheims (`en-drc`)      | Yes      | Yes    | Public domain                                             |
+| திருவிவிலியம் (`ta-tcb2012`) | Yes      | **No** | Permission pending. Staff can preview it in Admin → Bible |
+
 ## Other planned sources
 
 | Content                                      | Plan                                                                |

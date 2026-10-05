@@ -29,9 +29,10 @@ insert into public.rosary_mystery_sets (key, name_en, name_ta, weekdays, sort_or
 on conflict (key) do nothing;
 
 -- Bible books in Catholic canon order (canon_order drives canonical verse keys).
--- Reference versification: Hebrew-numbered Psalms, Joel 4 chapters, Malachi 3 chapters,
--- Daniel 14 chapters (as in the Nova Vulgata / NABRE). ESG and DAG hold the Greek
--- additions for translations that print them as separate books.
+-- Reference versification (see scripts/import/bible/versification.ts): the numbering of the
+-- Tamil common-language Bible and most English Bibles: Hebrew psalm numbers with titles not
+-- counted as verses, Joel 3 chapters, Malachi 4 chapters. ESG and DAG hold the Greek additions
+-- to Esther and Daniel. chapter_count is informational; readers use each translation's chapters.
 -- Tamil names follow the common-language Tamil Bible's book titles.
 insert into public.bible_books
   (code, osis_id, canon_order, testament, is_deuterocanonical, is_supplement, chapter_count, name_en, name_ta, full_name_ta, abbr_en, abbr_ta)
@@ -71,7 +72,7 @@ values
   ('EZK', 'Ezek', 33, 'old', false, false, 48, 'Ezekiel', 'எசேக்கியேல்', 'எசேக்கியேல்', 'Ezek', 'எசே'),
   ('DAN', 'Dan', 34, 'old', false, false, 14, 'Daniel', 'தானியேல்', 'தானியேல்', 'Dan', 'தானி'),
   ('HOS', 'Hos', 35, 'old', false, false, 14, 'Hosea', 'ஒசேயா', 'ஒசேயா', 'Hos', 'ஓசே'),
-  ('JOL', 'Joel', 36, 'old', false, false, 4, 'Joel', 'யோவேல்', 'யோவேல்', 'Joel', 'யோவே'),
+  ('JOL', 'Joel', 36, 'old', false, false, 3, 'Joel', 'யோவேல்', 'யோவேல்', 'Joel', 'யோவே'),
   ('AMO', 'Amos', 37, 'old', false, false, 9, 'Amos', 'ஆமோஸ்', 'ஆமோஸ்', 'Amos', 'ஆமோ'),
   ('OBA', 'Obad', 38, 'old', false, false, 1, 'Obadiah', 'ஒபதியா', 'ஒபதியா', 'Obad', 'ஒப'),
   ('JON', 'Jonah', 39, 'old', false, false, 4, 'Jonah', 'யோனா', 'யோனா', 'Jonah', 'யோனா'),
@@ -81,7 +82,7 @@ values
   ('ZEP', 'Zeph', 43, 'old', false, false, 3, 'Zephaniah', 'செப்பனியா', 'செப்பனியா', 'Zeph', 'செப்'),
   ('HAG', 'Hag', 44, 'old', false, false, 2, 'Haggai', 'ஆகாய்', 'ஆகாய்', 'Hag', 'ஆகா'),
   ('ZEC', 'Zech', 45, 'old', false, false, 14, 'Zechariah', 'செக்கரியா', 'செக்கரியா', 'Zech', 'செக்'),
-  ('MAL', 'Mal', 46, 'old', false, false, 3, 'Malachi', 'மலாக்கி', 'மலாக்கி', 'Mal', 'மலா'),
+  ('MAL', 'Mal', 46, 'old', false, false, 4, 'Malachi', 'மலாக்கி', 'மலாக்கி', 'Mal', 'மலா'),
   ('MAT', 'Matt', 47, 'new', false, false, 28, 'Matthew', 'மத்தேயு', 'மத்தேயு நற்செய்தி', 'Matt', 'மத்'),
   ('MRK', 'Mark', 48, 'new', false, false, 16, 'Mark', 'மாற்கு', 'மாற்கு நற்செய்தி', 'Mark', 'மாற்'),
   ('LUK', 'Luke', 49, 'new', false, false, 24, 'Luke', 'லூக்கா', 'லூக்கா நற்செய்தி', 'Luke', 'லூக்'),

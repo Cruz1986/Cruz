@@ -15,6 +15,7 @@ test("deep admin links keep their return path", async ({ page }) => {
 });
 
 test("sign-in page explains when sign-in is unavailable", async ({ page }) => {
+  test.skip(Boolean(process.env.NEXT_PUBLIC_SUPABASE_URL), "Supabase is configured");
   await page.goto("/en/login");
   await expect(page.getByRole("heading", { level: 1, name: "Sign in" })).toBeVisible();
   await expect(page.getByText("Sign-in is not available yet.")).toBeVisible();
