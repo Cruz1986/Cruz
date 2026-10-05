@@ -16,6 +16,7 @@ Requires Node 20.9+ and pnpm.
 pnpm install
 pnpm dev          # http://localhost:3000 -> redirects to /ta
 pnpm check        # lint, typecheck, tests, formatting
+pnpm test:e2e     # end-to-end + accessibility tests (run pnpm build first)
 pnpm db:test      # database migrations + pgTAP tests (needs local PostgreSQL + pgTAP, see docs/DATABASE.md)
 ```
 
@@ -23,4 +24,7 @@ pnpm db:test      # database migrations + pgTAP tests (needs local PostgreSQL + 
 
 - Phase 1 (foundation): done. App shell, Tamil/English routing, design system, themes, text sizing, PWA manifest.
 - Phase 2 (database): done. Schema, row level security, publish guard, audit log, reference seed, pgTAP tests.
-- Next: Phase 3 (authentication and roles in the app).
+- Phase 3 (authentication and roles): done. Email-link and Google sign-in via Supabase, role-protected admin
+  area, user and role management. To switch it on, see the Supabase setup steps in
+  [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md#setting-up-supabase).
+- Next: Phase 4 (Bible).

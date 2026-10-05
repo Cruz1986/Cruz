@@ -24,7 +24,9 @@
     "credits": "Sources & credits",
     "bookmarks": "Bookmarks",
     "highlights": "Highlights",
-    "notes": "Notes"
+    "notes": "Notes",
+    "account": "Account",
+    "admin": "Admin"
   },
   "home": {
     "todayLabel": "Today",
@@ -39,18 +41,46 @@
     "quickActions": "Quick actions"
   },
   "pages": {
-    "today": { "title": "Today", "description": "Daily Mass readings, liturgical day and saint." },
-    "bible": { "title": "Bible", "description": "Read the Bible in Tamil, English or side by side." },
-    "prayers": { "title": "Prayers", "description": "Catholic prayers in Tamil and English." },
-    "rosary": { "title": "Rosary", "description": "Pray the Rosary with a guided sequence." },
-    "saints": { "title": "Saints", "description": "Saint of the day and saint profiles." },
-    "calendar": { "title": "Liturgical Calendar", "description": "Seasons, celebrations and liturgical colours." },
-    "more": { "title": "More", "description": "Saints, calendar, personal tools and settings." },
-    "settings": { "title": "Settings", "description": "Language, appearance and reading size." },
+    "today": {
+      "title": "Today",
+      "description": "Daily Mass readings, liturgical day and saint."
+    },
+    "bible": {
+      "title": "Bible",
+      "description": "Read the Bible in Tamil, English or side by side."
+    },
+    "prayers": {
+      "title": "Prayers",
+      "description": "Catholic prayers in Tamil and English."
+    },
+    "rosary": {
+      "title": "Rosary",
+      "description": "Pray the Rosary with a guided sequence."
+    },
+    "saints": {
+      "title": "Saints",
+      "description": "Saint of the day and saint profiles."
+    },
+    "calendar": {
+      "title": "Liturgical Calendar",
+      "description": "Seasons, celebrations and liturgical colours."
+    },
+    "more": {
+      "title": "More",
+      "description": "Saints, calendar, personal tools and settings."
+    },
+    "settings": {
+      "title": "Settings",
+      "description": "Language, appearance and reading size."
+    },
     "credits": {
       "title": "Sources & credits",
       "description": "Where this app's content comes from and under what terms.",
       "empty": "Content sources and their licences will be listed here as content is added."
+    },
+    "login": {
+      "title": "Sign in",
+      "description": "Sign in or manage your account."
     }
   },
   "states": {
@@ -86,5 +116,58 @@
     "rose": "Rose",
     "black": "Black",
     "gold": "Gold"
+  },
+  "auth": {
+    "signInTitle": "Sign in",
+    "signInDescription": "Sign in to keep your bookmarks and notes on every device. Staff sign in here to manage content.",
+    "emailLabel": "Email address",
+    "emailSubmit": "Email me a sign-in link",
+    "sending": "Sending…",
+    "sent": "Check your email. We sent a sign-in link to {email}.",
+    "or": "or",
+    "google": "Continue with Google",
+    "privacy": "We only use your email to sign you in.",
+    "notConfigured": "Sign-in is not available yet.",
+    "error": {
+      "invalid_email": "Enter a valid email address.",
+      "failed": "Sign-in failed. Please try again.",
+      "callback": "That sign-in link is invalid or has expired. Please request a new one.",
+      "not_configured": "Sign-in is not available yet."
+    },
+    "accountTitle": "Account",
+    "signedInAs": "Signed in as {email}",
+    "signOut": "Sign out",
+    "openAdmin": "Open content management"
+  },
+  "admin": {
+    "title": "Content management",
+    "dashboard": "Dashboard",
+    "users": "Users & roles",
+    "backToSite": "Back to site",
+    "welcome": "Welcome, {email}",
+    "yourRoles": "Your roles",
+    "dashboardNote": "Editors for each kind of content (Bible, calendar, prayers, Rosary, saints) arrive with their phases.",
+    "usersDescription": "Grant and revoke staff roles.",
+    "search": "Search by email or name",
+    "searchSubmit": "Search",
+    "noUsers": "No users found.",
+    "grant": "Grant {role}",
+    "revoke": "Revoke {role}",
+    "disabled": "Disabled",
+    "you": "(you)",
+    "joined": "Joined {date}",
+    "result": {
+      "saved": "Saved.",
+      "forbidden": "You do not have permission to do that.",
+      "last_super_admin": "At least one active super admin must remain.",
+      "invalid": "Invalid request.",
+      "failed": "The change could not be saved."
+    }
+  },
+  "roles": {
+    "super_admin": "Super admin",
+    "content_admin": "Content admin",
+    "editor": "Editor",
+    "user": "Reader"
   }
 }

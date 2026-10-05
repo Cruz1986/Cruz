@@ -5,7 +5,7 @@ Target design: [ANALYSIS.md](ANALYSIS.md) §H–K. This file describes what is b
 ## Stack
 
 Next.js 16 (App Router, Turbopack) · React 19 · TypeScript strict · Tailwind CSS v4 · next-intl 4 · Vitest.
-Supabase Postgres schema: see [DATABASE.md](DATABASE.md). Auth and Storage wiring arrive in Phase 3.
+Supabase (Postgres + Auth): see [DATABASE.md](DATABASE.md) and the auth section below. Playwright + axe for end-to-end tests.
 
 ## Layout
 
@@ -43,7 +43,44 @@ proxy.ts                    # next-intl locale negotiation (Next 16 "proxy", for
   don't need `dark:` variants.
 - **Tamil typography:** Noto Sans Tamil (UI) and Noto Serif Tamil (`reading` utility). Line height is 1.8 for UI and 2.0
   for reading. Tamil is never letter-spaced or upper-cased.
+- **Tamil first.** `/` opens Tamil regardless of the browser language (many Tamil readers use phones set to English).
+  A language the reader chose before is remembered by next-intl's locale cookie.
 - **No sample content.** Modules show honest empty states until their data layer exists (PRD: content is data).
+
+## Authentication and roles
+
+```text
+proxy.ts            refreshes the Supabase session cookie; optimistic redirect of signed-out visitors away from /{locale}/admin
+lib/auth/session.ts getSessionUser(): verified with the Auth server + roles from current_user_roles(), memoised per request
+                    requireUser() / requireRoles(): every admin page calls these (layouts are display-only)
+lib/auth/actions.ts sign in with an emailed link or Google, sign out (server actions)
+app/api/auth/callback  exchanges the code / verifies the email token, then redirects to a same-origin ?next= only
+lib/admin/*         admin server actions: check the role first, then run as the user so RLS checks again
+```
+
+- The browser only ever has the **publishable** key. All data access runs with the user's own session,
+  so row level security applies. No service-role key is used anywhere in the app yet.
+- Signed-in users without a staff role get a 404 on admin URLs, so the admin area isn't revealed.
+- Without `NEXT_PUBLIC_SUPABASE_*` the app runs normally with sign-in switched off.
+
+### Setting up Supabase
+
+1. Create a project and apply the schema: `supabase link --project-ref <ref>`, then `supabase db push`. Load
+   `supabase/seed.sql` once (SQL editor or `psql`).
+2. Copy `.env.example` to `.env.local` and fill in `NEXT_PUBLIC_SUPABASE_URL`,
+   `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` and `NEXT_PUBLIC_SITE_URL`.
+3. Authentication → URL Configuration: set the Site URL and add `<SITE_URL>/api/auth/callback` to the
+   Redirect URLs.
+4. Optional: Authentication → Providers → Google (client ID and secret from Google Cloud).
+5. Sign in once, then make yourself the first super admin in the SQL editor:
+
+   ```sql
+   insert into public.user_roles (user_id, role_id)
+   select u.id, r.id from auth.users u, public.roles r
+   where u.email = 'you@example.com' and r.key = 'super_admin';
+   ```
+
+   After that, manage roles in the app under Admin → Users & roles.
 
 ## Commands
 

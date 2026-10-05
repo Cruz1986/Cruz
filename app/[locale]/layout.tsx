@@ -7,8 +7,6 @@ import { getTranslations, setRequestLocale } from "next-intl/server";
 import { routing } from "@/lib/i18n/routing";
 import { preferencesInitScript } from "@/lib/preferences";
 import { PreferencesProvider } from "@/components/preferences/preferences-provider";
-import { SiteHeader } from "@/components/layout/site-header";
-import { BottomNav } from "@/components/layout/bottom-nav";
 import { SkipLink } from "@/components/layout/skip-link";
 import "../globals.css";
 
@@ -70,11 +68,7 @@ export default async function LocaleLayout({ children, params }: Props) {
         <NextIntlClientProvider>
           <PreferencesProvider>
             <SkipLink />
-            <SiteHeader />
-            <main id="main" tabIndex={-1} className="mx-auto max-w-5xl px-4 pt-6 pb-28 lg:pb-12">
-              {children}
-            </main>
-            <BottomNav />
+            {children}
           </PreferencesProvider>
         </NextIntlClientProvider>
       </body>

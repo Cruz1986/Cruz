@@ -1,5 +1,5 @@
 import { getTranslations } from "next-intl/server";
-import { ChevronRight, Info } from "lucide-react";
+import { ChevronRight, Info, UserRound } from "lucide-react";
 import { Link } from "@/lib/i18n/navigation";
 import { initPage, pageMetadata, type LocaleParams } from "@/lib/i18n/page";
 import { PageHeader } from "@/components/ui/page-header";
@@ -14,6 +14,7 @@ export default async function MorePage({ params }: LocaleParams) {
   const t = await getTranslations();
   const items = [
     ...MORE_NAV.map(({ key, href, icon }) => ({ key, href, icon, label: t(`nav.${key}`) })),
+    { key: "account", href: "/login", icon: UserRound, label: t("nav.account") },
     { key: "credits", href: "/credits", icon: Info, label: t("nav.credits") },
   ];
 
