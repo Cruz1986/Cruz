@@ -1,0 +1,90 @@
+{
+  "app": {
+    "name": "Catholic Bible & Prayer",
+    "shortName": "Bible & Prayer",
+    "description": "Tamil and English Catholic Bible, daily readings, liturgical calendar, prayers and Rosary."
+  },
+  "language": {
+    "ta": "தமிழ்",
+    "en": "English",
+    "switchTo": "Switch language to {language}"
+  },
+  "nav": {
+    "main": "Main navigation",
+    "skipToContent": "Skip to content",
+    "home": "Home",
+    "today": "Today",
+    "bible": "Bible",
+    "prayers": "Prayers",
+    "rosary": "Rosary",
+    "saints": "Saints",
+    "calendar": "Calendar",
+    "more": "More",
+    "settings": "Settings",
+    "credits": "Sources & credits",
+    "bookmarks": "Bookmarks",
+    "highlights": "Highlights",
+    "notes": "Notes"
+  },
+  "home": {
+    "todayLabel": "Today",
+    "gospelTitle": "Today's Gospel",
+    "gospelEmpty": "Daily readings will appear here once the liturgical calendar is connected.",
+    "read": "Read",
+    "readings": "Readings",
+    "firstReading": "First Reading",
+    "psalm": "Responsorial Psalm",
+    "secondReading": "Second Reading",
+    "saintOfDay": "Saint of the Day",
+    "quickActions": "Quick actions"
+  },
+  "pages": {
+    "today": { "title": "Today", "description": "Daily Mass readings, liturgical day and saint." },
+    "bible": { "title": "Bible", "description": "Read the Bible in Tamil, English or side by side." },
+    "prayers": { "title": "Prayers", "description": "Catholic prayers in Tamil and English." },
+    "rosary": { "title": "Rosary", "description": "Pray the Rosary with a guided sequence." },
+    "saints": { "title": "Saints", "description": "Saint of the day and saint profiles." },
+    "calendar": { "title": "Liturgical Calendar", "description": "Seasons, celebrations and liturgical colours." },
+    "more": { "title": "More", "description": "Saints, calendar, personal tools and settings." },
+    "settings": { "title": "Settings", "description": "Language, appearance and reading size." },
+    "credits": {
+      "title": "Sources & credits",
+      "description": "Where this app's content comes from and under what terms.",
+      "empty": "Content sources and their licences will be listed here as content is added."
+    }
+  },
+  "states": {
+    "comingSoon": "Coming soon",
+    "comingSoonBody": "This section is being prepared. Content will appear here once it has been added and reviewed.",
+    "loading": "Loading…",
+    "notFoundTitle": "Page not found",
+    "notFoundBody": "The page you were looking for does not exist or has moved.",
+    "backHome": "Back to home",
+    "errorTitle": "Something went wrong",
+    "errorBody": "We could not load this page. Please try again.",
+    "retry": "Try again"
+  },
+  "settings": {
+    "language": "Language",
+    "theme": "Appearance",
+    "themeSystem": "System",
+    "themeLight": "Light",
+    "themeDark": "Dark",
+    "fontSize": "Text size",
+    "fontSizeValue": "{percent}%",
+    "decrease": "Decrease text size",
+    "increase": "Increase text size",
+    "reset": "Reset",
+    "preview": "Preview",
+    "previewText": "This is how text will look while reading. இப்படித்தான் வாசிக்கும்போது எழுத்துகள் தோன்றும்."
+  },
+  "liturgicalColor": {
+    "green": "Green",
+    "violet": "Violet",
+    "white": "White",
+    "red": "Red",
+    "rose": "Rose",
+    "black": "Black",
+    "gold": "Gold"
+  }
+}

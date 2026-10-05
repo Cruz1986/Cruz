@@ -1,0 +1,148 @@
+@import "tailwindcss";
+
+/* Dark utilities follow the resolved theme on <html data-theme>. */
+@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
+
+/* ---------- Design tokens ---------- */
+:root {
+  --font-scale: 1;
+
+  --bg: #faf8f4;
+  --surface: #ffffff;
+  --surface-muted: #f2efe8;
+  --fg: #1d1b18;
+  --fg-muted: #5c574f;
+  --border: #e3ded3;
+  --accent: #1f4e8c;
+  --accent-fg: #ffffff;
+  --accent-soft: #e6eef8;
+  --gold: #8a6a0c;
+  --focus: #1f4e8c;
+
+  --lit-green: #2f7d32;
+  --lit-violet: #6a3d9a;
+  --lit-white: #f5f3ee;
+  --lit-red: #b3261e;
+  --lit-rose: #c75b7f;
+  --lit-black: #1f1f1f;
+  --lit-gold: #c9a227;
+
+  color-scheme: light;
+}
+
+:root[data-theme="dark"] {
+  --bg: #111317;
+  --surface: #1a1d23;
+  --surface-muted: #23272e;
+  --fg: #ece9e3;
+  --fg-muted: #a9a49b;
+  --border: #2f343c;
+  --accent: #9dbdf0;
+  --accent-fg: #0d1a2e;
+  --accent-soft: #1d2a3d;
+  --gold: #e0c068;
+  --focus: #9dbdf0;
+  --lit-white: #e9e6df;
+  color-scheme: dark;
+}
+
+/* No-JS fallback: follow the OS until the pre-paint script sets data-theme. */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme]) {
+    --bg: #111317;
+    --surface: #1a1d23;
+    --surface-muted: #23272e;
+    --fg: #ece9e3;
+    --fg-muted: #a9a49b;
+    --border: #2f343c;
+    --accent: #9dbdf0;
+    --accent-fg: #0d1a2e;
+    --accent-soft: #1d2a3d;
+    --gold: #e0c068;
+    --focus: #9dbdf0;
+    --lit-white: #e9e6df;
+    color-scheme: dark;
+  }
+}
+
+@theme inline {
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-surface-muted: var(--surface-muted);
+  --color-fg: var(--fg);
+  --color-fg-muted: var(--fg-muted);
+  --color-border: var(--border);
+  --color-accent: var(--accent);
+  --color-accent-fg: var(--accent-fg);
+  --color-accent-soft: var(--accent-soft);
+  --color-gold: var(--gold);
+  --color-focus: var(--focus);
+
+  --color-lit-green: var(--lit-green);
+  --color-lit-violet: var(--lit-violet);
+  --color-lit-white: var(--lit-white);
+  --color-lit-red: var(--lit-red);
+  --color-lit-rose: var(--lit-rose);
+  --color-lit-black: var(--lit-black);
+  --color-lit-gold: var(--lit-gold);
+
+  --font-sans: var(--font-inter), var(--font-noto-sans-tamil), ui-sans-serif, system-ui, sans-serif;
+  --font-serif: var(--font-noto-serif-tamil), Georgia, "Times New Roman", serif;
+}
+
+/* ---------- Base ---------- */
+@layer base {
+  html {
+    /* Every rem-based size follows the reader's chosen text size. */
+    font-size: calc(100% * var(--font-scale));
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    background: var(--bg);
+    color: var(--fg);
+    font-family: var(--font-sans);
+    line-height: 1.6;
+    text-rendering: optimizeLegibility;
+  }
+
+  /* Tamil glyphs have tall vowel signs above and below the base line. */
+  :lang(ta) body,
+  [lang="ta"] {
+    line-height: 1.8;
+  }
+
+  /* Never letter-space or upper-case Tamil text: it breaks conjuncts and has no case. */
+  :lang(ta) {
+    letter-spacing: normal !important;
+    text-transform: none !important;
+  }
+
+  :focus-visible {
+    outline: 3px solid var(--focus);
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+}
+
+/* ---------- Reading typography (Scripture, prayers) ---------- */
+@utility reading {
+  font-family: var(--font-serif);
+  font-size: 1.125rem;
+  line-height: 1.75;
+  max-width: 65ch;
+
+  &:lang(ta) {
+    line-height: 2;
+  }
+}
