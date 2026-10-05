@@ -38,6 +38,26 @@ to Daniel, onto the reference numbering. About 150 other chapters differ by a ve
 Tobit, Judith and Sirach follow a different textual tradition. There the parallel view matches by verse number
 and tells the reader that numbering can differ.
 
+## Lectionary and calendar
+
+The Today page needs two steps after the Bible import:
+
+```bash
+# 1. Reading lists (references only, no reading texts) from jayarathina/Tamil-Catholic-Lectionary
+pnpm import:lectionary --path /path/to/Tamil-Catholic-Lectionary/MySQL/liturgy_lectionary_table_readings__list.sql
+
+# 2. Generate liturgical days (re-run yearly; days marked is_override are kept)
+pnpm calendar:generate --calendar in --from 2025 --to 2030
+```
+
+- The lectionary import upserts one set per day ID ("OW05-0Sun A", "Saint Agnes, virgin and martyr", "_Martyr", …),
+  replaces its readings and parses each reference ("எசா58:7-10") into verse ranges in the reference numbering.
+  About 7% of rows are not references (pointers, Commons, sequence names) and are kept as display text.
+- The generator writes each day's code, titles, colour, season, week and cycles, links its celebrations, and points
+  each Mass (vigil, night, dawn, day, chrism) at its reading sets. Days whose readings are missing are reported.
+- Reading text on the Today page comes from the published Bible translation in the reader's language, falling
+  back to another published one, and is labelled with its source. The official Lectionary wording is not stored.
+
 ## Local development database
 
 ```bash
@@ -45,5 +65,5 @@ scripts/db/setup-local.sh app_dev                      # schema + seed in a loca
 DATABASE_URL=postgres://postgres@localhost:5432/app_dev pnpm import:bible --preset en-drc --path DRC.csv --publish
 ```
 
-Browser tests that need Bible data: build with `NEXT_PUBLIC_SUPABASE_*` pointing at a Supabase (or PostgREST)
-API over that database, then run `E2E_BIBLE=1 pnpm test:e2e`.
+Browser tests that need data (Bible, lectionary, calendar): build with `NEXT_PUBLIC_SUPABASE_*` pointing at a Supabase (or PostgREST)
+API over that database, then run `E2E_DATA=1 pnpm test:e2e`.

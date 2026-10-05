@@ -68,6 +68,29 @@ scripts/import/              Bible importers (see IMPORT.md)
   chapter read is remembered on the device. Bookmarks, highlights and notes come with accounts in Phase 10.
 - Staff can preview unpublished translations under Admin → Bible.
 
+## Today and the liturgical calendar
+
+```text
+lib/liturgy/generate.ts   calendar engine: a TypeScript port of Roman-Calendar v5 (seasons, movable feasts,
+                          precedence, transfers, memorials, colours), tested day by day against its 2026/2027 output
+lib/liturgy/index.ts      season, week, Sunday cycle A/B/C, weekday cycle I/II, titles (English + Tamil)
+lib/liturgy/lectionary.ts lectionary type codes, Tamil reference parser, lectionary set lookup
+lib/liturgy/readings.ts   assembles a day's Masses (alternatives, shorter forms, memorial propers, Easter Vigil,
+                          one reading before the Gospel on weekday feasts)
+lib/content/today.ts      loads a generated day with its readings and fetches passage text by canonical verse key
+scripts/calendar/         writes generated years into liturgical_days (admins can override single days)
+app/[locale]/(public)/today      today (rendered for India's date; the browser moves to the reader's own date)
+app/[locale]/(public)/today/[date]  any day, incrementally static
+app/api/today             JSON API
+```
+
+- The default calendar is the General Roman Calendar with India's proper calendar (`in`): Epiphany, Ascension
+  and Corpus Christi on Sunday, plus India's proper celebrations. `gr` is available too.
+- Lectionary references use the Tamil Bible's numbering, which is the reference versification, so passages
+  are fetched from any published translation by canonical verse key, including Douay-Rheims psalms.
+- Static pages built while the database is unreachable render the empty state instead of failing the build
+  (`lib/content/build-safe.ts`). At runtime, errors keep the last good page.
+
 ## Authentication and roles
 
 ```text

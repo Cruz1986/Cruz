@@ -229,5 +229,77 @@
     "verified": "Verified",
     "pending": "Permission pending",
     "restricted": "Restricted"
+  },
+  "today": {
+    "readings": "Readings",
+    "mass": {
+      "vigil": "Vigil Mass",
+      "night": "Mass during the Night",
+      "dawn": "Mass at Dawn",
+      "day": "Mass during the Day",
+      "chrism": "Chrism Mass"
+    },
+    "reading": {
+      "procession_gospel": "Gospel at the Procession",
+      "first": "First Reading",
+      "firstNumbered": "Reading {n}",
+      "psalm": "Responsorial Psalm",
+      "second": "Second Reading",
+      "sequence": "Sequence",
+      "acclamation": "Gospel Acclamation",
+      "gospel": "Gospel",
+      "commons": "Common"
+    },
+    "or": "or",
+    "shorter": "Shorter form",
+    "season": {
+      "advent": "Advent",
+      "christmas": "Christmas Time",
+      "ordinary": "Ordinary Time",
+      "lent": "Lent",
+      "triduum": "Easter Triduum",
+      "easter": "Easter Time"
+    },
+    "seasonWeek": "{season} · Week {week}",
+    "kind": {
+      "solemnity": "Solemnity",
+      "feast": "Feast",
+      "memorial": "Memorial",
+      "optional_memorial": "Optional memorial",
+      "commemoration": "Commemoration",
+      "weekday": "Weekday",
+      "sunday": "Sunday"
+    },
+    "cycles": "Sunday cycle {sunday} · Weekday cycle {weekday}",
+    "alsoToday": "Also today",
+    "memorialReadings": "Readings for {name} (optional)",
+    "commons": "May be taken from: {list}",
+    "commonsName": {
+      "Martyr": "Common of Martyrs",
+      "Pastor": "Common of Pastors",
+      "Virgin": "Common of Virgins",
+      "Saint": "Common of Holy Men and Women",
+      "Mary": "Common of the Blessed Virgin Mary",
+      "Doctor": "Common of Doctors of the Church",
+      "Church": "Common of the Dedication of a Church"
+    },
+    "commonsGroup": {
+      "1": "those who practised works of mercy",
+      "2": "educators",
+      "3": "widows",
+      "4": "popes",
+      "5": "religious",
+      "6": "missionaries"
+    },
+    "textFrom": "Text: {name}. The Lectionary's own wording may differ.",
+    "noText": "Bible text for this reading is not available yet.",
+    "readInBible": "Read in the Bible",
+    "previousDay": "Previous day",
+    "nextDay": "Next day",
+    "noReadings": "Readings are not available for this day yet.",
+    "unavailable": "The liturgical calendar is not available yet.",
+    "unavailableBody": "Daily readings appear here once the calendar has been generated.",
+    "openToday": "Today's readings",
+    "dateHeading": "Readings for {date}"
   }
 }

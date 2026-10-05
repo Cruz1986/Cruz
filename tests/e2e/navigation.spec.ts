@@ -19,8 +19,9 @@ test.describe("with an English browser", () => {
 test("today's readings are one tap from home", async ({ page }) => {
   await page.goto("/en");
   await page.getByRole("link", { name: "Read", exact: true }).click();
-  await expect(page).toHaveURL(/\/en\/today$/);
-  await expect(page.getByRole("heading", { level: 1, name: "Today" })).toBeVisible();
+  // /today shows (or redirects to) the reader's own date.
+  await expect(page).toHaveURL(/\/en\/today(\/\d{4}-\d{2}-\d{2})?$/);
+  await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
 });
 
 test("switching language keeps the current page", async ({ page }) => {

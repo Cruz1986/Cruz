@@ -14,7 +14,9 @@
     "check": "pnpm lint && pnpm typecheck && pnpm test && pnpm format:check",
     "db:test": "scripts/db/test.sh",
     "test:e2e": "playwright test",
-    "import:bible": "tsx scripts/import/bible.ts"
+    "import:bible": "tsx scripts/import/bible.ts",
+    "import:lectionary": "tsx --tsconfig tsconfig.json scripts/import/lectionary.ts",
+    "calendar:generate": "tsx --tsconfig tsconfig.json scripts/calendar/generate.ts"
   },
   "dependencies": {
     "@supabase/ssr": "^0.12.7",

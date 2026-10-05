@@ -3,9 +3,9 @@ import { expect, test } from "@playwright/test";
 /*
  * Bible reader against real data. Needs a database with the Douay-Rheims import published
  * (see docs/IMPORT.md) and the app built with NEXT_PUBLIC_SUPABASE_* pointing at it.
- * Enabled with E2E_BIBLE=1; otherwise only the "no data" behaviour is checked.
+ * Enabled with E2E_DATA=1; otherwise only the "no data" behaviour is checked.
  */
-const withData = Boolean(process.env.E2E_BIBLE);
+const withData = Boolean(process.env.E2E_DATA);
 
 test.describe("without Bible data", () => {
   test.skip(withData, "data is configured");
@@ -17,7 +17,7 @@ test.describe("without Bible data", () => {
 });
 
 test.describe("with Bible data", () => {
-  test.skip(!withData, "set E2E_BIBLE=1 with a database containing en-drc");
+  test.skip(!withData, "set E2E_DATA=1 with a database containing the imports");
 
   test("browse from the book list to a chapter and on to the next", async ({ page }) => {
     await page.goto("/en/bible/en-drc");
