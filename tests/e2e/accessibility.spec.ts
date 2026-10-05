@@ -1,7 +1,7 @@
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test } from "@playwright/test";
 
-const PAGES = ["/ta", "/en", "/ta/settings", "/en/more", "/ta/login", "/en/bible"];
+const PAGES = ["/ta", "/en", "/ta/settings", "/en/more", "/ta/login", "/en/bible", "/en/library", "/ta/saints"];
 
 for (const path of PAGES) {
   test(`no WCAG A/AA violations on ${path}`, async ({ page }) => {

@@ -63,6 +63,7 @@ export function ChapterText({
       "data-verse": verse.verse,
       "data-label": verse.label,
       "data-text": verse.text,
+      "data-key": verse.key ?? undefined,
     };
 
     if (verse.isPoetry) {

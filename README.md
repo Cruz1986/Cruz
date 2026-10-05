@@ -46,4 +46,8 @@ pnpm db:test      # database migrations + pgTAP tests (needs local PostgreSQL + 
   profiles with feast, life span, patronage, related prayers and a link to the feast's readings; links from
   Today and Home; staff admin; `/api/saints`, `/api/saints/today`, `/api/saints/search`, `/api/saints/[slug]`.
   Tamil biographies and saint images still to be added.
-- Next: Phase 10 (personal features).
+- Phase 10 (personal): done. My library with Bible bookmarks, five-colour highlights (shown in every
+  translation), private notes on verses, prayers and saints, favourites, recently opened history and data
+  download. Works on the device without an account and syncs to the reader's account when signed in
+  (owner-only database access, merge on sign-in, cleared from the device on sign-out).
+- Next: Phase 11 (admin CMS).

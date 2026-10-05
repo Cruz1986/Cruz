@@ -1,7 +1,19 @@
-import { BookOpen, CalendarDays, Ellipsis, Flower2, HandHeart, Home, Settings, Sun, Users } from "lucide-react";
+import {
+  BookOpen,
+  CalendarDays,
+  Ellipsis,
+  Flower2,
+  HandHeart,
+  Home,
+  Library,
+  Settings,
+  Sun,
+  Users,
+} from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 
-export type NavKey = "home" | "today" | "bible" | "prayers" | "rosary" | "saints" | "calendar" | "more" | "settings";
+export type NavKey =
+  "home" | "today" | "bible" | "prayers" | "rosary" | "saints" | "calendar" | "library" | "more" | "settings";
 
 export type NavItem = { key: NavKey; href: string; icon: LucideIcon };
 
@@ -13,6 +25,7 @@ export const NAV_ITEMS: Record<NavKey, NavItem> = {
   rosary: { key: "rosary", href: "/rosary", icon: Flower2 },
   saints: { key: "saints", href: "/saints", icon: Users },
   calendar: { key: "calendar", href: "/calendar", icon: CalendarDays },
+  library: { key: "library", href: "/library", icon: Library },
   more: { key: "more", href: "/more", icon: Ellipsis },
   settings: { key: "settings", href: "/settings", icon: Settings },
 };
@@ -37,7 +50,13 @@ export const HEADER_NAV: NavItem[] = [
 ];
 
 /** Secondary destinations listed on the More page. */
-export const MORE_NAV: NavItem[] = [NAV_ITEMS.rosary, NAV_ITEMS.saints, NAV_ITEMS.calendar, NAV_ITEMS.settings];
+export const MORE_NAV: NavItem[] = [
+  NAV_ITEMS.library,
+  NAV_ITEMS.rosary,
+  NAV_ITEMS.saints,
+  NAV_ITEMS.calendar,
+  NAV_ITEMS.settings,
+];
 
 export function isActive(pathname: string, href: string): boolean {
   if (href === "/") return pathname === "/";

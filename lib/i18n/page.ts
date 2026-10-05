@@ -16,7 +16,17 @@ export async function initPage(params: LocaleParams["params"]): Promise<Locale> 
 }
 
 export type PageKey =
-  "today" | "bible" | "prayers" | "rosary" | "saints" | "calendar" | "more" | "settings" | "credits" | "login";
+  | "today"
+  | "bible"
+  | "prayers"
+  | "rosary"
+  | "saints"
+  | "calendar"
+  | "library"
+  | "more"
+  | "settings"
+  | "credits"
+  | "login";
 
 export async function pageMetadata(params: LocaleParams["params"], key: PageKey): Promise<Metadata> {
   const { locale } = await params;

@@ -97,7 +97,10 @@ export async function ChapterView({
       {compare ? (
         <ParallelText chapter={chapter} other={compare.translation} otherVerses={compare.verses} />
       ) : (
-        <VerseSelection reference={reference}>
+        <VerseSelection
+          reference={reference}
+          location={{ translation: translation.code, book: book.code, chapter: chapter.chapter }}
+        >
           <ChapterText verses={chapter.verses} headings={chapter.headings} language={translation.language} />
         </VerseSelection>
       )}

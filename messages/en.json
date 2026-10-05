@@ -22,11 +22,9 @@
     "more": "More",
     "settings": "Settings",
     "credits": "Sources & credits",
-    "bookmarks": "Bookmarks",
-    "highlights": "Highlights",
-    "notes": "Notes",
     "account": "Account",
-    "admin": "Admin"
+    "admin": "Admin",
+    "library": "My library"
   },
   "home": {
     "todayLabel": "Today",
@@ -81,6 +79,10 @@
     "login": {
       "title": "Sign in",
       "description": "Sign in or manage your account."
+    },
+    "library": {
+      "title": "My library",
+      "description": "Your bookmarks, highlights, notes, favourites and history."
     }
   },
   "states": {
@@ -470,6 +472,55 @@
       "years_order": "The year of death must not be before the year of birth.",
       "biography_required": "Add a biography in at least one language before publishing.",
       "invalid": "Check this field."
+    }
+  },
+  "personal": {
+    "bookmark": "Bookmark",
+    "removeBookmark": "Remove bookmark",
+    "highlight": "Highlight",
+    "removeHighlight": "Remove highlight",
+    "colors": {
+      "yellow": "Yellow",
+      "green": "Green",
+      "blue": "Blue",
+      "pink": "Pink",
+      "purple": "Purple"
+    },
+    "note": "Note",
+    "editNote": "Edit note",
+    "noteFor": "Note on {name}",
+    "notePlaceholder": "Your private note",
+    "noteHelp": "Only you can see your notes.",
+    "save": "Save",
+    "delete": "Delete",
+    "cancel": "Cancel",
+    "favorite": "Add to favourites",
+    "favorited": "In favourites",
+    "bookmarks": "Bookmarks",
+    "highlights": "Highlights",
+    "notes": "Notes",
+    "favorites": "Favourites",
+    "history": "Recently opened",
+    "emptyBookmarks": "Tap a verse in the Bible and choose Bookmark.",
+    "emptyHighlights": "Tap a verse in the Bible and choose a colour.",
+    "emptyNotes": "Add notes to verses, prayers and saints.",
+    "emptyFavorites": "Add the prayers and saints you return to.",
+    "emptyHistory": "Chapters, prayers and saints you open appear here.",
+    "remove": "Remove {name}",
+    "clearHistory": "Clear history",
+    "download": "Download my data",
+    "deviceOnly": "Saved on this device",
+    "deviceOnlyBody": "Sign in to keep your library on all your devices.",
+    "signIn": "Sign in",
+    "synced": "Saved to your account",
+    "syncing": "Syncing…",
+    "syncError": "Your account could not be reached. Changes are kept on this device and will sync next time.",
+    "privacy": "Only you can see your library.",
+    "kind": {
+      "verse": "Verse",
+      "chapter": "Bible",
+      "prayer": "Prayer",
+      "saint": "Saint"
     }
   }
 }

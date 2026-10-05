@@ -40,7 +40,7 @@ Enforced in the database, not only in the UI:
 - **Editors** cannot create, publish, edit or delete published content.
 - **Audit log.** Every change to content and reference tables is recorded with before/after JSON and the
   actor. It is insert-only and readable by publishers. It doubles as revision history.
-- **Personal tables** (`bookmarks`, `favorites`, `highlights`, `notes`, `reading_history`,
+- **Personal tables** (`bookmarks`, `favorites`, `highlights`, `notes`, `history`,
   `notification_preferences`, `push_subscriptions`) are owner-only.
 - **Profiles.** Users may change their preferences but not `disabled_at`. A disabled account loses its roles.
 
@@ -54,7 +54,7 @@ Enforced in the database, not only in the UI:
 | Liturgy       | `liturgical_calendars`, `celebrations`, `liturgical_days`, `liturgical_day_celebrations`, `liturgical_day_masses`, `lectionary_sets`, `lectionary_readings`, `lectionary_reading_ranges`, `lectionary_texts`, `reflections` |
 | Prayer        | `prayer_categories`, `prayers`, `rosary_mystery_sets`, `rosary_mysteries`, `rosary_steps`                                                                                                                                   |
 | Saints, media | `saints`, `saint_prayers`, `media`                                                                                                                                                                                          |
-| Personal      | `bookmarks`, `favorites`, `highlights`, `notes`, `reading_history`                                                                                                                                                          |
+| Personal      | `bookmarks`, `favorites`, `highlights`, `notes`, `history`                                                                                                                                                                  |
 | Notifications | `notification_preferences`, `push_subscriptions`, `notifications`                                                                                                                                                           |
 
 ## Bible model
@@ -95,6 +95,17 @@ chapter × 1 000 + verse`) in the reference versification, which is the Tamil co
 - `celebrations.saint_id` links calendar celebrations to the saint they honour; several celebrations may share a
   saint (Saint John the Baptist's birth and martyrdom).
 - `saint_prayers` links saints to prayers in the library.
+
+## Personal model
+
+- Items are identified by stable keys rather than row ids, so the same item saved on two devices (or before
+  signing in) merges into one: a verse is `<translation>/<BOOK>/<chapter>/<verse>`, a chapter
+  `<translation>/<BOOK>/<chapter>`, prayers and saints are their slugs (`private.valid_entity_key`).
+- `bookmarks`, `favorites`, `notes`: unique per user, type and key (one note per item).
+- `highlights`: one per user and canonical verse, so a highlight shows in every translation; `location` is where
+  it was made.
+- `history`: chapters, prayers and saints opened; a trigger keeps the latest 200 per user.
+- Owner-only RLS on every table; the browser writes them directly with the reader's own session.
 
 ## Content-table checklist
 

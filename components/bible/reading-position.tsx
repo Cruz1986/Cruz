@@ -1,50 +1,33 @@
 "use client";
 
-import { useEffect, useSyncExternalStore } from "react";
 import { ArrowRight, BookOpen } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { Link } from "@/lib/i18n/navigation";
+import { usePersonalStore } from "@/lib/personal/client";
+import { chapterKey, parseLocation } from "@/lib/personal/store";
+import { RecordVisit } from "@/components/personal/item-actions";
 
-const KEY = "bible:last";
-type Position = { translation: string; book: string; chapter: number; title: string };
-
-function read(): string | null {
-  try {
-    return window.localStorage.getItem(KEY);
-  } catch {
-    return null;
-  }
+/** Adds the chapter to the reader's history (which also powers "Continue reading"). */
+export function RememberPosition({
+  translation,
+  book,
+  chapter,
+  title,
+}: {
+  translation: string;
+  book: string;
+  chapter: number;
+  title: string;
+}) {
+  return <RecordVisit type="chapter" entityKey={chapterKey(translation, book, chapter)} title={title} />;
 }
-
-function parse(raw: string | null): Position | null {
-  try {
-    const value = raw ? (JSON.parse(raw) as Position) : null;
-    return value && typeof value.chapter === "number" && typeof value.book === "string" ? value : null;
-  } catch {
-    return null;
-  }
-}
-
-/** Remembers the chapter being read on this device (accounts sync it later, Phase 10). */
-export function RememberPosition(position: Position) {
-  const { translation, book, chapter, title } = position;
-  useEffect(() => {
-    try {
-      window.localStorage.setItem(KEY, JSON.stringify({ translation, book, chapter, title }));
-    } catch {
-      // storage unavailable
-    }
-  }, [translation, book, chapter, title]);
-  return null;
-}
-
-const subscribe = () => () => {};
 
 export function ContinueReading() {
   const t = useTranslations("bible");
-  const raw = useSyncExternalStore(subscribe, read, () => null);
-  const position = parse(raw);
-  if (!position) return null;
+  const store = usePersonalStore();
+  const last = store.history.find((h) => h.type === "chapter");
+  const position = last ? parseLocation(last.key) : null;
+  if (!last || !position) return null;
 
   return (
     <Link
@@ -54,7 +37,7 @@ export function ContinueReading() {
       <BookOpen aria-hidden className="text-accent size-5" />
       <span className="flex-1">
         <span className="text-fg-muted block text-sm">{t("continueReading")}</span>
-        <span className="font-semibold">{position.title}</span>
+        <span className="font-semibold">{last.title}</span>
       </span>
       <ArrowRight aria-hidden className="text-accent size-4" />
     </Link>

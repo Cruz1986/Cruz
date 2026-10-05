@@ -27,6 +27,13 @@
   --lit-black: #1f1f1f;
   --lit-gold: #c9a227;
 
+  /* Verse highlights: soft enough to keep text contrast. */
+  --hl-yellow: #fdf0a6;
+  --hl-green: #cdeccf;
+  --hl-blue: #cfe2fb;
+  --hl-pink: #f8d4e3;
+  --hl-purple: #e4d7f5;
+
   color-scheme: light;
 }
 
@@ -43,6 +50,11 @@
   --gold: #e0c068;
   --focus: #9dbdf0;
   --lit-white: #e9e6df;
+  --hl-yellow: #4d4317;
+  --hl-green: #1f4224;
+  --hl-blue: #1d3554;
+  --hl-pink: #4f2337;
+  --hl-purple: #3a2b52;
   color-scheme: dark;
 }
 
@@ -61,6 +73,11 @@
     --gold: #e0c068;
     --focus: #9dbdf0;
     --lit-white: #e9e6df;
+    --hl-yellow: #4d4317;
+    --hl-green: #1f4224;
+    --hl-blue: #1d3554;
+    --hl-pink: #4f2337;
+    --hl-purple: #3a2b52;
     color-scheme: dark;
   }
 }
@@ -145,4 +162,36 @@
   &:lang(ta) {
     line-height: 2;
   }
+}
+
+/* ---------- Personal marks on Bible verses (set by the reader's library) ---------- */
+.verse[data-highlight="yellow"] {
+  background: var(--hl-yellow);
+}
+.verse[data-highlight="green"] {
+  background: var(--hl-green);
+}
+.verse[data-highlight="blue"] {
+  background: var(--hl-blue);
+}
+.verse[data-highlight="pink"] {
+  background: var(--hl-pink);
+}
+.verse[data-highlight="purple"] {
+  background: var(--hl-purple);
+}
+.verse[data-bookmarked] {
+  text-decoration: underline dotted var(--accent);
+  text-underline-offset: 0.3em;
+}
+.verse[data-noted]::after {
+  content: " ✎";
+  color: var(--accent);
+  font-family: var(--font-sans);
+  font-size: 0.8em;
+}
+.verse[data-selected] {
+  background: var(--accent-soft);
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
 }

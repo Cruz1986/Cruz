@@ -146,6 +146,27 @@ app/api/saints[/today|/search|/slug] JSON API
 - Images come from the `media` table (Supabase storage bucket `media`) with alt text and attribution; uploading
   arrives with the admin CMS (Phase 11).
 
+## Personal library
+
+```text
+lib/personal/store.ts         library model: keys, add/remove, merge of device and account (unit tested)
+lib/personal/sync.ts          store items ↔ account rows (bookmarks, highlights, notes, favorites, history)
+lib/personal/client.ts        browser store (local storage) + account sync, used through usePersonalStore()
+lib/db/browser.ts             the reader's Supabase client in the browser (own rows only, by RLS)
+components/personal/          library page, note dialog, favourite / note / history helpers, sync starter
+app/[locale]/(public)/library My library: bookmarks, highlights, notes, favourites, recently opened, download
+```
+
+- Works without an account: everything is kept in the browser (`personal:v1`). Pages stay static; the library
+  is drawn in the browser.
+- Signed in: on each visit the device and the account are merged (newer version of an item wins, the device's
+  new items are uploaded), and every change is written to both. If the account can't be reached the change
+  stays on the device and is uploaded on the next visit.
+- Signing out forgets the account's library on that device; a page load without a session does the same.
+- Bible verses: tap to select, then bookmark, highlight (five colours) or add a note; marks are drawn on the
+  verses. Prayers and saints: favourite and note buttons. Opening chapters, prayers and saints adds them to the
+  history, which also powers "Continue reading".
+
 ## Authentication and roles
 
 ```text

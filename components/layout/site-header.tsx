@@ -7,6 +7,7 @@ import { LanguageSwitcher } from "./language-switcher";
 export function SiteHeader() {
   const t = useTranslations();
   const SettingsIcon = NAV_ITEMS.settings.icon;
+  const LibraryIcon = NAV_ITEMS.library.icon;
 
   return (
     <header className="border-border bg-bg/90 sticky top-0 z-30 border-b backdrop-blur">
@@ -35,6 +36,13 @@ export function SiteHeader() {
         </nav>
 
         <LanguageSwitcher />
+        <Link
+          href={NAV_ITEMS.library.href}
+          aria-label={t("nav.library")}
+          className="text-fg-muted hover:bg-surface-muted hover:text-fg hidden size-10 items-center justify-center rounded-full md:inline-flex"
+        >
+          <LibraryIcon aria-hidden className="size-5" />
+        </Link>
         <Link
           href={NAV_ITEMS.settings.href}
           aria-label={t("nav.settings")}

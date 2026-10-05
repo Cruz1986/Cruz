@@ -9,6 +9,7 @@ import { publicBible } from "@/lib/content/public-bible";
 import { prayerTitle } from "@/lib/content/prayers";
 import { DEFAULT_TIME_ZONE } from "@/lib/i18n/request";
 import { todayIn, toIso } from "@/lib/liturgy/plain-date";
+import { FavoriteButton, NoteButton, NoteView, RecordVisit } from "@/components/personal/item-actions";
 import { excerpt, feastLabel, lifeSpan, nextFeastDate, saintName, saintTitle } from "@/lib/saints/helpers";
 
 export const revalidate = 3600;
@@ -97,8 +98,14 @@ export default async function SaintPage({ params }: Props) {
               {t("readingsOfFeast", { date: feast })}
             </Link>
           ) : null}
+          <div className="flex flex-wrap gap-2 pt-1">
+            <FavoriteButton type="saint" slug={saint.slug} />
+            <NoteButton type="saint" slug={saint.slug} name={name} />
+          </div>
+          <RecordVisit type="saint" entityKey={saint.slug} title={name} />
         </div>
       </header>
+      <NoteView type="saint" slug={saint.slug} />
 
       <section aria-labelledby="life" className="border-border bg-surface space-y-3 rounded-2xl border p-5">
         <h2 id="life" className="font-semibold">

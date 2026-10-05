@@ -8,6 +8,7 @@ import { publicBible } from "@/lib/content/public-bible";
 import { prayerPlainText } from "@/lib/prayers/markup";
 import { PrayerText } from "@/components/prayers/prayer-text";
 import { PrayerActions } from "@/components/prayers/prayer-actions";
+import { NoteButton, NoteView, RecordVisit } from "@/components/personal/item-actions";
 
 export const revalidate = 3600;
 export function generateStaticParams() {
@@ -55,12 +56,17 @@ export default async function PrayerPage({ params }: Props) {
           </Link>
         ) : null}
         <h1 className="text-fg text-2xl font-bold sm:text-3xl">{title}</h1>
-        <PrayerActions
-          slug={prayer.slug}
-          title={primary.title ?? title}
-          plainText={prayerPlainText(primary.body ?? "")}
-        />
+        <div className="flex flex-wrap gap-2">
+          <PrayerActions
+            slug={prayer.slug}
+            title={primary.title ?? title}
+            plainText={prayerPlainText(primary.body ?? "")}
+          />
+          <NoteButton type="prayer" slug={prayer.slug} name={title} />
+        </div>
+        <RecordVisit type="prayer" entityKey={prayer.slug} title={title} />
       </header>
+      <NoteView type="prayer" slug={prayer.slug} />
 
       {versions.map((v) =>
         v.body ? (

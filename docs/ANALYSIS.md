@@ -3,7 +3,7 @@
 Response to the "First action — no coding" step of the master prompt in [PRD.md](./PRD.md) §22.
 No application code has been written. Implementation starts only after this plan is approved.
 
-Status: **approved 2026-10-05** · Phases 1–9 implemented
+Status: **approved 2026-10-05** · Phases 1–10 implemented
 
 ---
 
@@ -372,3 +372,5 @@ Defaults apply until you say otherwise. Data sources are evaluated in [CONTENT_R
 | `liturgical_days` as the only per-day data                | Days also store the engine's day code, titles, precedence and kind; Masses link reading sets with a role (base / memorial) | Today renders from one query; memorial propers are applied when the page is built       |
 | Lectionary texts in `lectionary_texts`                    | Not imported. Readings show Bible passages by verse range, labelled with the translation                                   | The Lectionary wording is licensed separately                                           |
 | Saint of the Day from `saints` feast dates                | From the celebrations the calendar keeps that day (`celebrations.saint_id`), then saints whose feast falls on the date     | Follows transferred and impeded celebrations; shared feasts (Peter and Paul) show both  |
+| Personal features in V1.1, keyed by row ids               | Built in Phase 10: device-first library that syncs to the account when signed in; items keyed by location or slug          | Works for readers without an account; the same item saved on two devices merges cleanly |
+| `reading_history` (last position per translation)         | `history` of chapters, prayers and saints (latest 200)                                                                     | One list serves "Continue reading" and prayer/saint history                             |

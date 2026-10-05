@@ -2,6 +2,7 @@ import type { ReactNode } from "react";
 import { initPage } from "@/lib/i18n/page";
 import { SiteHeader } from "@/components/layout/site-header";
 import { BottomNav } from "@/components/layout/bottom-nav";
+import { PersonalSync } from "@/components/personal/personal-sync";
 
 export default async function PublicLayout({
   children,
@@ -19,6 +20,7 @@ export default async function PublicLayout({
         {children}
       </main>
       <BottomNav />
+      <PersonalSync />
     </>
   );
 }
