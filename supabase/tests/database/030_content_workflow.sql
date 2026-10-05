@@ -8,7 +8,7 @@ insert into public.content_sources (name, license_type, permission_status)
 values ('Test source', 'original', 'pending') returning id as source \gset
 insert into public.content_sources (name, license_type, permission_status)
 values ('Verified source', 'original', 'verified') returning id as verified \gset
-insert into public.prayer_categories (slug, name_en, name_ta) values ('daily', 'Daily', 'அன்றாடம்') returning id as category \gset
+insert into public.prayer_categories (slug, name_en, name_ta) values ('test-category', 'Test', 'சோதனை') returning id as category \gset
 
 -- Editor -------------------------------------------------------------------
 select tests.authenticate_as(:'editor');
