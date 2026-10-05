@@ -71,3 +71,18 @@ export async function signOut(formData: FormData): Promise<void> {
   await supabase?.auth.signOut();
   redirect(`/${locale}`);
 }
+
+export type DeleteAccountState = { status: "idle" } | { status: "error"; error: "last_super_admin" | "failed" };
+
+/** Deletes the signed-in account and everything personal in it (see delete_my_account), then signs out. */
+export async function deleteAccount(_prev: DeleteAccountState, formData: FormData): Promise<DeleteAccountState> {
+  const locale = localeOf(String(formData.get("locale") ?? ""));
+  if (formData.get("confirm") !== "yes") return { status: "error", error: "failed" };
+  const supabase = await createSupabaseServerClient();
+  if (!supabase) return { status: "error", error: "failed" };
+  const { error } = await supabase.rpc("delete_my_account");
+  if (error) return { status: "error", error: error.hint === "last_super_admin" ? "last_super_admin" : "failed" };
+  // The session's user no longer exists; this clears the session cookies.
+  await supabase.auth.signOut({ scope: "local" });
+  redirect(`/${locale}`);
+}

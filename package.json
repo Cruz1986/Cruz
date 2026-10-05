@@ -21,7 +21,9 @@
     "import:prayers": "tsx --tsconfig tsconfig.json scripts/import/prayers.ts",
     "import:rosary": "tsx --tsconfig tsconfig.json scripts/import/rosary.ts",
     "import:saints": "tsx --tsconfig tsconfig.json scripts/import/saints.ts",
-    "load-test": "node scripts/load-test.mjs"
+    "load-test": "node scripts/load-test.mjs",
+    "preflight": "tsx --tsconfig tsconfig.json scripts/preflight.ts",
+    "admin:grant": "tsx --tsconfig tsconfig.json scripts/admin/grant-role.ts"
   },
   "dependencies": {
     "@supabase/ssr": "^0.12.7",

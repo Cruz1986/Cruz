@@ -15,8 +15,8 @@ function authorized(header: string | null): boolean {
 }
 
 /**
- * GET /api/cron/notifications — sends the reminders and announcements that are due. Called every 15 minutes
- * by the scheduler with `Authorization: Bearer $CRON_SECRET` (Vercel Cron sends it automatically).
+ * GET /api/cron/notifications — sends the reminders and announcements that are due. Called every 15 minutes by a
+ * scheduler with `Authorization: Bearer $CRON_SECRET` (see docs/DEPLOYMENT.md › Reminders).
  */
 export async function GET(request: Request) {
   if (!process.env.CRON_SECRET) return apiError(503, "not_configured", "CRON_SECRET is not set.");
@@ -25,6 +25,8 @@ export async function GET(request: Request) {
   const db = createServiceClient();
   const provider = configuredProvider();
   if (!db || !provider) return apiError(503, "not_configured", "Service key or notification provider is not set.");
-  const summary = await runNotifications(db, provider);
+  // Look back an hour: a late or skipped scheduler run then delays reminders rather than losing them (each
+  // reader still gets one per date; see due_reminders).
+  const summary = await runNotifications(db, provider, { windowMinutes: 60 });
   return json({ provider: provider.name, ...summary });
 }

@@ -3,7 +3,7 @@
 Response to the "First action — no coding" step of the master prompt in [PRD.md](./PRD.md) §22.
 No application code has been written. Implementation starts only after this plan is approved.
 
-Status: **approved 2026-10-05** · Phases 1–14 implemented
+Status: **approved 2026-10-05** · Phases 1–15 implemented (deployment runbook in DEPLOYMENT.md)
 
 ---
 

@@ -5,6 +5,7 @@ import { notFound } from "next/navigation";
 import { NextIntlClientProvider, hasLocale } from "next-intl";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { routing } from "@/lib/i18n/routing";
+import { getSiteUrl } from "@/lib/env";
 import { preferencesInitScript } from "@/lib/preferences";
 import { PreferencesProvider } from "@/components/preferences/preferences-provider";
 import { SkipLink } from "@/components/layout/skip-link";
@@ -37,6 +38,7 @@ export async function generateMetadata({ params }: Omit<Props, "children">): Pro
   if (!hasLocale(routing.locales, locale)) return {};
   const t = await getTranslations({ locale, namespace: "app" });
   return {
+    metadataBase: new URL(getSiteUrl()),
     title: { default: t("name"), template: `%s · ${t("shortName")}` },
     description: t("description"),
     applicationName: t("name"),

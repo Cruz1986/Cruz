@@ -1,5 +1,5 @@
 import { getTranslations } from "next-intl/server";
-import { ChevronRight, Info, UserRound } from "lucide-react";
+import { ChevronRight, Info, ShieldCheck, UserRound } from "lucide-react";
 import { Link } from "@/lib/i18n/navigation";
 import { initPage, pageMetadata, type LocaleParams } from "@/lib/i18n/page";
 import { PageHeader } from "@/components/ui/page-header";
@@ -16,6 +16,7 @@ export default async function MorePage({ params }: LocaleParams) {
     ...MORE_NAV.map(({ key, href, icon }) => ({ key, href, icon, label: t(`nav.${key}`) })),
     { key: "account", href: "/login", icon: UserRound, label: t("nav.account") },
     { key: "credits", href: "/credits", icon: Info, label: t("nav.credits") },
+    { key: "privacy", href: "/privacy", icon: ShieldCheck, label: t("nav.privacy") },
   ];
 
   return (

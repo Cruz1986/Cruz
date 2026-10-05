@@ -106,6 +106,8 @@ chapter × 1 000 + verse`) in the reference versification, which is the Tamil co
   it was made.
 - `history`: chapters, prayers and saints opened; a trigger keeps the latest 200 per user.
 - Owner-only RLS on every table; the browser writes them directly with the reader's own session.
+- `delete_my_account()`: a signed-in reader deletes their own account; every personal row cascades with it, content
+  they edited as staff stays (author set to null). Refused for the last active super admin.
 
 ## Search
 
@@ -120,8 +122,10 @@ chapter × 1 000 + verse`) in the reference versification, which is the Tamil co
 
 - `notification_preferences` (one row per reader): enabled, parts, `preferred_time`, `timezone` (checked to be a real
   time zone). `push_subscriptions`: the reader's devices. Both owner-only.
-- `notification_deliveries` (reader, local date): written by the job before sending, so a reminder goes out once.
-- `due_reminders(now, window)`: readers due now (service role only).
+- `notification_deliveries` (reader, date): written by the job before sending, so a reminder goes out once per date —
+  the date on which the reader's chosen time fell, also when it is sent after midnight.
+- `due_reminders(now, window)`: readers whose time fell within the window and who have no delivery for that date
+  (service role only; the app asks for 60 minutes so late scheduler runs catch up).
 - `notifications`: announcements with `status`, `sent_at` and `recipients`.
 
 ## Admin support

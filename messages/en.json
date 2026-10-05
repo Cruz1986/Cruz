@@ -25,7 +25,8 @@
     "account": "Account",
     "admin": "Admin",
     "library": "My library",
-    "search": "Search"
+    "search": "Search",
+    "privacy": "Privacy"
   },
   "home": {
     "todayLabel": "Today",
@@ -75,7 +76,17 @@
     "credits": {
       "title": "Sources & credits",
       "description": "Where this app's content comes from and under what terms.",
-      "empty": "Content sources and their licences will be listed here as content is added."
+      "empty": "Content sources and their licences will be listed here as content is added.",
+      "textsTitle": "Texts",
+      "approval": "Ecclesiastical approval: {approval}",
+      "licenseLink": "Licence",
+      "dataTitle": "Data and software",
+      "calendar": "Rules of the liturgical calendar adapted from jayarathina/Roman-Calendar (public domain).",
+      "lectionary": "The list of readings for each day from jayarathina/Tamil-Catholic-Lectionary (public domain); the reading texts shown come from the Bibles above.",
+      "fonts": "Fonts: Noto Sans Tamil, Noto Serif Tamil and Inter (SIL Open Font License).",
+      "icons": "Icons: Lucide (ISC License).",
+      "images": "Saint images are credited on each saint's page.",
+      "privacy": "How this app handles your data"
     },
     "login": {
       "title": "Sign in",
@@ -88,6 +99,35 @@
     "search": {
       "title": "Search",
       "description": "Bible, prayers, saints, the calendar and readings."
+    },
+    "privacy": {
+      "title": "Privacy",
+      "description": "What this app keeps about you, and how to remove it.",
+      "noAccount": {
+        "title": "Without an account",
+        "body": "You can use everything without signing in. Your settings and your library (bookmarks, highlights, notes, favourites and recently opened pages) are then kept only in this browser, on this device. They are not sent to us."
+      },
+      "account": {
+        "title": "With an account",
+        "body": "When you sign in, we keep your email address (and, if you use Google, the name Google shares) so that you can sign in again, and your library, so that it is the same on all your devices. Your library and notes are private: only you can see them in the app."
+      },
+      "reminders": {
+        "title": "Daily reminders",
+        "body": "If you turn on reminders, we keep the time, time zone and parts you chose, and a push address for each device you allow. Notifications travel through your browser's push service (run by Google, Apple or Mozilla). Turning reminders off on a device, or signing out, removes its address."
+      },
+      "notDone": {
+        "title": "What we do not do",
+        "body": "No advertising, no tracking or analytics, and nothing is sold or shared. The only cookie keeps you signed in; your display settings stay in your browser."
+      },
+      "storage": {
+        "title": "Where it is kept",
+        "body": "Accounts and libraries are stored with Supabase; the site is served by Vercel. Like any website, the hosting keeps short-lived technical logs (such as IP addresses) to run and protect the service."
+      },
+      "choices": {
+        "title": "Your choices",
+        "body": "Download your library at any time from My library (“Download my data”). Delete your account from the Account page: your library, notes, reminder settings and devices are deleted with it."
+      },
+      "contact": "Questions about your data: {email}"
     }
   },
   "states": {
@@ -144,7 +184,18 @@
     "accountTitle": "Account",
     "signedInAs": "Signed in as {email}",
     "signOut": "Sign out",
-    "openAdmin": "Open content management"
+    "openAdmin": "Open content management",
+    "delete": {
+      "title": "Delete my account",
+      "body": "This permanently deletes your account and everything saved in it: bookmarks, highlights, notes, favourites, history, reminder settings and devices. To keep a copy, use “Download my data” in My library first. This cannot be undone.",
+      "confirm": "I understand that this cannot be undone.",
+      "submit": "Delete my account",
+      "deleting": "Deleting…",
+      "error": {
+        "last_super_admin": "You are the only super admin. Give someone else that role before deleting your account.",
+        "failed": "Your account could not be deleted. Please try again."
+      }
+    }
   },
   "admin": {
     "title": "Content management",

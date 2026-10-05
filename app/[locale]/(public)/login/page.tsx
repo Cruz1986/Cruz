@@ -12,6 +12,7 @@ import { EmptyState } from "@/components/ui/empty-state";
 import { buttonClasses } from "@/components/ui/button";
 import { SignInPanel } from "@/components/auth/sign-in-panel";
 import { SignOutButton } from "@/components/auth/sign-out-button";
+import { DeleteAccount } from "@/components/auth/delete-account";
 
 type Props = {
   params: Promise<{ locale: string }>;
@@ -55,6 +56,7 @@ export default async function LoginPage({ params, searchParams }: Props) {
             ) : null}
             <SignOutButton />
           </div>
+          <DeleteAccount />
         </Card>
       </>
     );

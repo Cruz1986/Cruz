@@ -6,7 +6,7 @@ import { AlertTriangle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { EmptyState } from "@/components/ui/empty-state";
 
-export default function ErrorPage({ error, reset }: { error: Error & { digest?: string }; reset: () => void }) {
+export default function ErrorPage({ error, retry }: { error: Error & { digest?: string }; retry: () => void }) {
   const t = useTranslations("states");
 
   useEffect(() => {
@@ -18,7 +18,7 @@ export default function ErrorPage({ error, reset }: { error: Error & { digest?: 
       icon={AlertTriangle}
       title={t("errorTitle")}
       body={t("errorBody")}
-      action={<Button onClick={reset}>{t("retry")}</Button>}
+      action={<Button onClick={() => retry()}>{t("retry")}</Button>}
     />
   );
 }

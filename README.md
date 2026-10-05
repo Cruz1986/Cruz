@@ -8,6 +8,8 @@ A Tamil-first, English-supported Catholic platform: Bible, daily readings, litur
 - Database: [docs/DATABASE.md](docs/DATABASE.md)
 - Content rights: [docs/CONTENT_RIGHTS.md](docs/CONTENT_RIGHTS.md)
 - Importing content: [docs/IMPORT.md](docs/IMPORT.md)
+- Deploying to production: [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md)
+- Security and quality checks: [docs/SECURITY.md](docs/SECURITY.md), [docs/QUALITY.md](docs/QUALITY.md)
 
 ## Getting started
 
@@ -19,6 +21,7 @@ pnpm dev          # http://localhost:3000 -> redirects to /ta
 pnpm check        # lint, typecheck, tests, formatting
 pnpm test:e2e     # end-to-end + accessibility tests (run pnpm build first)
 pnpm db:test      # database migrations + pgTAP tests (needs local PostgreSQL + pgTAP, see docs/DATABASE.md)
+pnpm preflight --env-file .env.production.local --site   # production readiness (see docs/DEPLOYMENT.md)
 ```
 
 ## Status
@@ -26,8 +29,7 @@ pnpm db:test      # database migrations + pgTAP tests (needs local PostgreSQL + 
 - Phase 1 (foundation): done. App shell, Tamil/English routing, design system, themes, text sizing, PWA manifest.
 - Phase 2 (database): done. Schema, row level security, publish guard, audit log, reference seed, pgTAP tests.
 - Phase 3 (authentication and roles): done. Email-link and Google sign-in via Supabase, role-protected admin
-  area, user and role management. To switch it on, see the Supabase setup steps in
-  [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md#setting-up-supabase).
+  area, user and role management. To switch it on, see [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md).
 - Phase 4 (Bible): done. Book and chapter navigation, reader (Tamil typography, poetry, headings), side-by-side
   view, verse copy and share, search by words or reference, JSON API, import pipeline. Douay-Rheims is public;
   the Tamil Bible is imported for staff preview only until permission is confirmed.
@@ -65,4 +67,9 @@ pnpm db:test      # database migrations + pgTAP tests (needs local PostgreSQL + 
   whole database, a client-bundle secret check in CI, search rate limits; JavaScript per page roughly halved and
   Bible search up to 140× faster; accessibility checks on every section and the admin; page-weight budgets and a
   load test. See docs/SECURITY.md and docs/QUALITY.md.
-- Next: Phase 15 (production deployment).
+- Phase 15 (production deployment): ready to deploy. Step-by-step runbook for Supabase, Vercel and GitHub; workflows
+  that deploy the database (migrations + reference seed) and import all public content from pinned, checksummed
+  sources; a reminder scheduler that works on free plans (late runs delay reminders instead of losing them);
+  `pnpm preflight` checks variables, database and the live site; `pnpm admin:grant` makes the first admin;
+  sitemap with hreflang, robots (previews not indexed), health endpoint, structured error logs, a last-resort
+  error page; Sources & credits page from the database; privacy page; readers can delete their account.

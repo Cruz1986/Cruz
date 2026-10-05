@@ -1,0 +1,36 @@
+name: Import content
+
+# Loads (or refreshes) all public content in the production database: Douay-Rheims, prayers, Rosary, lectionary,
+# the liturgical calendar and saints. Run it by hand after the first database deploy, and each year to extend the
+# calendar. Re-running is safe: edits made in the admin are kept.
+on:
+  workflow_dispatch:
+    inputs:
+      from:
+        description: First calendar year (default last year)
+        required: false
+      to:
+        description: Last calendar year (default four years ahead)
+        required: false
+
+concurrency:
+  group: production-database
+  cancel-in-progress: false
+
+jobs:
+  import:
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: scripts/import/all.sh "$RUNNER_TEMP/sources" "$FROM" "$TO"
+        env:
+          DATABASE_URL: ${{ secrets.SUPABASE_DB_URL }}
+          FROM: ${{ inputs.from }}
+          TO: ${{ inputs.to }}

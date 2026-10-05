@@ -26,6 +26,7 @@ export type PageKey =
   | "more"
   | "settings"
   | "credits"
+  | "privacy"
   | "login";
 
 export async function pageMetadata(params: LocaleParams["params"], key: PageKey): Promise<Metadata> {

@@ -179,30 +179,15 @@ lib/admin/*         admin server actions: check the role first, then run as the 
 ```
 
 - The browser only ever has the **publishable** key. All data access runs with the user's own session,
-  so row level security applies. No service-role key is used anywhere in the app yet.
+  so row level security applies. The service-role key is used only by the scheduled reminder job, on the server.
 - Signed-in users without a staff role get a 404 on admin URLs, so the admin area isn't revealed.
 - Without `NEXT_PUBLIC_SUPABASE_*` the app runs normally with sign-in switched off.
 
 ### Setting up Supabase
 
-1. Create a project and apply the schema: `supabase link --project-ref <ref>`, then `supabase db push`. Load
-   `supabase/seed.sql` once (SQL editor or `psql`).
-2. Copy `.env.example` to `.env.local` and fill in `NEXT_PUBLIC_SUPABASE_URL`,
-   `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` and `NEXT_PUBLIC_SITE_URL`.
-3. Authentication → URL Configuration: set the Site URL and add `<SITE_URL>/api/auth/callback` to the
-   Redirect URLs.
-4. Optional: Authentication → Providers → Google (client ID and secret from Google Cloud).
-5. Sign in once, then make yourself the first super admin in the SQL editor:
-
-   ```sql
-   insert into public.user_roles (user_id, role_id)
-   select u.id, r.id from auth.users u, public.roles r
-   where u.email = 'you@example.com' and r.key = 'super_admin';
-   ```
-
-   After that, manage roles in the app under Admin → Users & roles.
-
-6. The migrations create a public Storage bucket `media` (images up to 15 MB) with upload rights for staff.
+See [DEPLOYMENT.md](DEPLOYMENT.md): it covers the project, auth settings, Google sign-in and the first super admin
+(`pnpm admin:grant`). The migrations create a public Storage bucket `media` (images up to 15 MB) with upload rights
+for staff.
 
 ## Search
 
@@ -226,7 +211,7 @@ app/[locale]/(public)/search  search page (header search icon); app/api/search: 
 lib/notifications/compose.ts   what a reminder says: the chosen parts, in the reader's language (unit tested)
 lib/notifications/provider.ts  delivery behind an interface: Web Push (VAPID) or a log (development)
 lib/notifications/send.ts      one run of the job: due reminders (once per reader and local date), due announcements
-app/api/cron/notifications     the job's endpoint, called every 15 minutes with the CRON_SECRET
+app/api/cron/notifications     the job's endpoint, called every 15 minutes with the CRON_SECRET (looks back an hour)
 components/preferences/reminder-settings.tsx   Settings › Daily reminder; public/sw.js shows notifications
 app/[locale]/(admin)/admin/notifications       announcements (content admins)
 ```
@@ -237,10 +222,11 @@ app/[locale]/(admin)/admin/notifications       announcements (content admins)
   their preferences and devices are their own rows (row level security).
 - **Announcements**: content admins schedule a notification (India time) for every reader with reminders on. It is
   claimed (`scheduled → sending → sent`) so it goes out once.
-- **The job** runs with the service role: `due_reminders()` lists readers whose time falls in the window (across
-  midnight too) and who have a device and no delivery yet for their local date; each delivery is claimed in
+- **The job** runs with the service role: `due_reminders()` lists readers whose time fell within the last hour (across
+  midnight too) and who have a device and no delivery yet for the date that time fell on; each delivery is claimed in
   `notification_deliveries` before sending, so overlapping or repeated runs never send twice. Devices the push
-  service reports as gone are removed.
+  service reports as gone are removed. A late or skipped scheduler run therefore delays reminders, never doubles
+  or loses them.
 - **Signing out** stops push on that device and removes its subscription.
 - **Provider**: `NOTIFICATION_PROVIDER=log` prints messages; otherwise Web Push with the VAPID keys. Another service
   (e.g. a native app push service) can implement `NotificationProvider`.
@@ -250,9 +236,9 @@ app/[locale]/(admin)/admin/notifications       announcements (content admins)
 1. Generate keys: `npx web-push generate-vapid-keys`. Set `NEXT_PUBLIC_VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY` and
    `VAPID_SUBJECT` (a `mailto:` address), plus `SUPABASE_SERVICE_ROLE_KEY` and a random `CRON_SECRET`, in the
    hosting environment (never in a `NEXT_PUBLIC_` variable except the public key).
-2. Schedule `GET /api/cron/notifications` every 15 minutes with `Authorization: Bearer $CRON_SECRET`. `vercel.json`
-   does this on Vercel (frequent cron jobs need a paid plan); otherwise use Supabase `pg_cron` + `pg_net`, or any
-   scheduler that can send the header.
+2. Schedule `GET /api/cron/notifications` every 15 minutes with `Authorization: Bearer $CRON_SECRET`: the
+   `Reminders` GitHub workflow, Vercel Cron on a paid plan, or any scheduler that can send the header (see
+   [DEPLOYMENT.md](DEPLOYMENT.md#5-reminders)).
 3. On iPhone, Web Push works once the app is added to the Home Screen (iOS 16.4+).
 
 ## Admin (content management)

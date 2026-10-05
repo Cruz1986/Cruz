@@ -3,6 +3,7 @@
 import { useActionState } from "react";
 import { Mail } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
+import { Link } from "@/lib/i18n/navigation";
 import { signInWithEmail, signInWithGoogle, type SignInState } from "@/lib/auth/actions";
 import { Button } from "@/components/ui/button";
 
@@ -10,6 +11,7 @@ const initialState: SignInState = { status: "idle" };
 
 export function SignInPanel({ next }: { next: string }) {
   const t = useTranslations("auth");
+  const tNav = useTranslations("nav");
   const locale = useLocale();
   const [state, formAction, pending] = useActionState(signInWithEmail, initialState);
 
@@ -65,7 +67,12 @@ export function SignInPanel({ next }: { next: string }) {
         </Button>
       </form>
 
-      <p className="text-fg-muted text-sm">{t("privacy")}</p>
+      <p className="text-fg-muted text-sm">
+        {t("privacy")}{" "}
+        <Link href="/privacy" className="underline underline-offset-2">
+          {tNav("privacy")}
+        </Link>
+      </p>
     </div>
   );
 }

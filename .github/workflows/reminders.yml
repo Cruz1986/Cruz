@@ -1,0 +1,24 @@
+name: Reminders
+
+# Calls the reminder job every 15 minutes — for hosting plans whose own scheduler cannot run that often.
+# Switched on by the repository variable REMINDER_SCHEDULER=github (Settings → Secrets and variables → Actions),
+# with the secrets SITE_URL and CRON_SECRET. GitHub may start a run late; the job looks back an hour, so a late
+# run only delays reminders.
+on:
+  schedule:
+    - cron: "*/15 * * * *"
+  workflow_dispatch:
+
+jobs:
+  run:
+    if: vars.REMINDER_SCHEDULER == 'github'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Send due reminders
+        run: |
+          curl --fail-with-body -sS --retry 2 --max-time 120 \
+            -H "Authorization: Bearer $CRON_SECRET" "${SITE_URL%/}/api/cron/notifications"
+        env:
+          SITE_URL: ${{ secrets.SITE_URL }}
+          CRON_SECRET: ${{ secrets.CRON_SECRET }}

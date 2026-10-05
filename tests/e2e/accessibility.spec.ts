@@ -20,8 +20,10 @@ const PAGES = [
   "/en/library",
   "/ta/saints",
   "/en/search?q=thomas",
+  "/ta/privacy",
 ];
 const DATA_PAGES = [
+  "/en/credits",
   "/ta/today",
   "/en/today/2026-12-03",
   "/ta/calendar",

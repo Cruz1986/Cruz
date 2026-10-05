@@ -21,7 +21,8 @@ are owner-only. Server actions check the role first and then write as the signed
 again. The publish guard refuses to publish anything whose source is not verified with a known licence.
 
 **Functions.** Owner-rights (`security definer`) functions all pin `search_path` (tested); anonymous visitors can
-call only the two role checks. The scheduled job's reader list (`due_reminders`) is service-role only. Bible
+call only the two role checks. The scheduled job's reader list (`due_reminders`) is service-role only;
+`delete_my_account` acts only on the caller's own account. Bible
 search builds its query from LIKE-escaped words quoted with `format('%L')`; there is no other dynamic SQL.
 
 **Secrets.** Only `NEXT_PUBLIC_*` values reach the browser; `lib/db/service.ts` and the notification provider are
@@ -43,7 +44,7 @@ leads to a path on this site (tested against `//`, `/\` and absolute URLs).
 reminder job needs the `CRON_SECRET` (compared in constant time); Supabase rate-limits sign-in e-mails.
 
 **Accounts and devices.** Signing out clears the account's library from the device and stops push
-notifications there. Image uploads go straight to storage under staff-only policies with type and size checks.
+notifications there. Readers can delete their account and all their personal data (Account page). Image uploads go straight to storage under staff-only policies with type and size checks.
 
 ## Checks to run
 
@@ -53,10 +54,12 @@ notifications there. Image uploads go straight to storage under staff-only polic
 | Database rules          | `scripts/db/test.sh` (RLS per table, roles, workflow, functions) |
 | Secrets in the bundle   | `pnpm build && pnpm check:bundle`                                |
 | Headers, CSP, redirects | `pnpm test:e2e tests/e2e/security.spec.ts`                       |
+| Production settings     | `pnpm preflight --env-file .env.production.local --site`         |
 
 ## Before launch
 
-- Rotate every key used during development; set production secrets only in the hosting provider.
+- Rotate every key used during development; set production secrets only in the hosting provider (mark them
+  Sensitive in Vercel). `pnpm preflight` refuses a secret in any `NEXT_PUBLIC_` variable.
 - In Supabase: enable leaked-password protection and e-mail confirmation, restrict the Auth redirect URLs to the
   production domain, and keep the service role key out of every client.
 - Review staff accounts and roles (Admin → Users & roles).

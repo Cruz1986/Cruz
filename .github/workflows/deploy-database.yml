@@ -1,0 +1,32 @@
+name: Deploy database
+
+# Applies new migrations and the reference seed to the production database. Runs when they change on main,
+# or by hand. Migrations must keep the previous app version working: Vercel deploys the app at the same time.
+on:
+  push:
+    branches: [main]
+    paths: [supabase/migrations/**, supabase/seed.sql, supabase/config.toml]
+  workflow_dispatch:
+
+concurrency:
+  group: production-database
+  cancel-in-progress: false
+
+jobs:
+  migrate:
+    runs-on: ubuntu-latest
+    # Settings → Environments → production: add the secret, and optionally required reviewers.
+    environment: production
+    steps:
+      - uses: actions/checkout@v4
+      - uses: supabase/setup-cli@v1
+        with:
+          version: 2.119.0
+      - name: Pending migrations
+        run: supabase db push --db-url "$SUPABASE_DB_URL" --include-seed --dry-run
+        env:
+          SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+      - name: Apply
+        run: supabase db push --db-url "$SUPABASE_DB_URL" --include-seed --yes
+        env:
+          SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
