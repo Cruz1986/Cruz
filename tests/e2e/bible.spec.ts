@@ -32,6 +32,8 @@ test.describe("with Bible data", () => {
 
   test("continue reading appears after reading a chapter", async ({ page }) => {
     await page.goto("/en/bible/en-drc/psa/23");
+    // The position is saved just after hydration; wait for it before leaving the page.
+    await expect.poll(() => page.evaluate(() => localStorage.getItem("bible:last"))).not.toBeNull();
     await page.goto("/en/bible");
     await expect(page.getByRole("link", { name: /Continue reading/ })).toContainText("Psalms 23");
   });

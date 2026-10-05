@@ -94,6 +94,24 @@ app/api/calendar          JSON API (?month=YYYY-MM)
 - Static pages built while the database is unreachable render the empty state instead of failing the build
   (`lib/content/build-safe.ts`). At runtime, errors keep the last good page.
 
+## Prayers
+
+```text
+lib/prayers/markup.ts         constrained prayer format → structured lines (no HTML, nothing to inject)
+lib/content/prayers.ts        categories and prayers (client passed in; public pages use the anonymous client)
+app/[locale]/(public)/prayers library with instant search (titles and text) and device-saved favourites
+app/[locale]/(public)/prayers/[slug]  prayer in the reader's language first, then the other; copy, share, save
+app/[locale]/(admin)/admin/prayers    list, create, edit, review, publish, delete
+lib/admin/prayer-form.ts      form validation and which statuses each role may set (unit tested)
+lib/admin/prayer-actions.ts   server actions: check the role, then write as the user (RLS and the publish guard apply)
+app/api/prayers[/slug]        JSON API
+```
+
+- Editors save drafts or send prayers for review; content admins publish, archive and delete. The database
+  enforces the same rules and refuses to publish a prayer whose source isn't verified.
+- Saving revalidates the public prayer pages in both languages straight away.
+- Favourites are kept on the device until accounts arrive (Phase 10).
+
 ## Authentication and roles
 
 ```text

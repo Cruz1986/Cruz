@@ -38,6 +38,17 @@ to Daniel, onto the reference numbering. About 150 other chapters differ by a ve
 Tobit, Judith and Sirach follow a different textual tradition. There the parallel view matches by verse number
 and tells the reader that numbering can differ.
 
+## Prayers
+
+```bash
+pnpm import:prayers --path data/import/prayers/traditional-en.json --publish
+```
+
+`data/import/prayers/traditional-en.json` holds 20 common prayers in their traditional English wording (public
+domain), curated for this project, including everything the Rosary needs. Prayers are upserted by slug, and only the
+fields in the file are written, so Tamil texts added by editors in the admin survive a re-import. Prayer text uses a
+small format (lines, paragraphs, ℣/℟, _italic_, **bold**), described in `lib/prayers/markup.ts`.
+
 ## Lectionary and calendar
 
 The Today page needs two steps after the Bible import:

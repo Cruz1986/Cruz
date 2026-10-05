@@ -11,6 +11,7 @@ This file records what has been evaluated. It is not legal advice: confirm right
 3. A repository's software licence (MIT, Unlicense, …) covers its **code**. It does not grant rights to
    third-party texts stored in it.
 4. Copyrighted text never goes into this repository. Import scripts read it from a local path at import time.
+   Public-domain texts curated for the project (e.g. `data/import/prayers/traditional-en.json`) may be committed.
 
 ## Evaluated sources
 

@@ -12,6 +12,7 @@ export async function AdminHeader({ roles }: { roles: readonly RoleKey[] }) {
   const items = [
     { href: "/admin", label: t("admin.dashboard") },
     { href: "/admin/bible", label: t("admin.bible") },
+    { href: "/admin/prayers", label: t("adminPrayers.prayers") },
     ...(canManageUsers(roles) ? [{ href: "/admin/users", label: t("admin.users") }] : []),
   ];
 

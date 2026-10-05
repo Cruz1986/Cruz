@@ -35,4 +35,7 @@ pnpm db:test      # database migrations + pgTAP tests (needs local PostgreSQL + 
   vigils and memorial propers, passage text, day navigation, home page Today card, `/api/today`.
 - Phase 6 (calendar): done. Month view with liturgical colours, ranks, memorials and season changes, month
   navigation, links to each day's readings, `/api/calendar`.
-- Next: Phase 7 (prayer library).
+- Phase 7 (prayers): done. Prayer library by category with search, prayer pages (Tamil first when available),
+  copy, share and device favourites; admin create, edit, review, publish and delete; 20 public-domain English
+  prayers. Tamil prayer texts are waiting for a source with clear rights.
+- Next: Phase 8 (Rosary).

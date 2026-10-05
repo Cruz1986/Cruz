@@ -564,3 +564,13 @@ from (values
 ) as v (code, language, alias)
 join public.bible_books b on b.code = v.code
 on conflict (language, alias_norm) do nothing;
+
+-- Prayer categories (taxonomy only; prayer texts are imported, see docs/IMPORT.md).
+insert into public.prayer_categories (slug, name_en, name_ta, sort_order) values
+  ('essential', 'Essential prayers', 'அடிப்படைச் செபங்கள்', 1),
+  ('daily', 'Daily prayers', 'அன்றாடச் செபங்கள்', 2),
+  ('marian', 'Prayers to Mary', 'மரியன்னை செபங்கள்', 3),
+  ('saints-angels', 'Saints and angels', 'புனிதர்களும் வானதூதர்களும்', 4),
+  ('sacraments', 'Confession and Communion', 'ஒப்புரவு மற்றும் நற்கருணை', 5),
+  ('departed', 'For the faithful departed', 'இறந்தோருக்காக', 6)
+on conflict (slug) do nothing;

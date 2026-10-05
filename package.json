@@ -16,7 +16,8 @@
     "test:e2e": "playwright test",
     "import:bible": "tsx scripts/import/bible.ts",
     "import:lectionary": "tsx --tsconfig tsconfig.json scripts/import/lectionary.ts",
-    "calendar:generate": "tsx --tsconfig tsconfig.json scripts/calendar/generate.ts"
+    "calendar:generate": "tsx --tsconfig tsconfig.json scripts/calendar/generate.ts",
+    "import:prayers": "tsx --tsconfig tsconfig.json scripts/import/prayers.ts"
   },
   "dependencies": {
     "@supabase/ssr": "^0.12.7",

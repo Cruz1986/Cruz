@@ -315,5 +315,66 @@
     "seasonStarts": "{season} begins",
     "dayLink": "{date}: {title}",
     "feastMark": "Feast"
+  },
+  "prayers": {
+    "search": "Search prayers",
+    "searchPlaceholder": "Type a prayer's name",
+    "noResults": "No prayers match “{q}”.",
+    "favorites": "Saved on this device",
+    "save": "Save prayer",
+    "saved": "Saved",
+    "copy": "Copy",
+    "copied": "Copied",
+    "share": "Share",
+    "english": "English",
+    "tamil": "தமிழ்",
+    "tamilPending": "The Tamil text of this prayer will be added once its source has been confirmed.",
+    "englishMissing": "This prayer is not yet available in English.",
+    "unavailable": "Prayers are not available yet.",
+    "unavailableBody": "Prayers appear here once they have been added and published.",
+    "source": "Source: {attribution}",
+    "inCategory": "More {category}",
+    "count": "{count, plural, one {# prayer} other {# prayers}}",
+    "showLanguage": "Text language"
+  },
+  "adminPrayers": {
+    "prayers": "Prayers",
+    "newPrayer": "New prayer",
+    "editPrayer": "Edit prayer",
+    "noPrayers": "No prayers yet.",
+    "languages": "Languages",
+    "updated": "Updated {date}",
+    "form": {
+      "english": "English",
+      "tamil": "Tamil",
+      "title": "Title",
+      "text": "Text",
+      "textHelp": "One line per line of the prayer. Blank line = new paragraph. Start lines with ℣. or ℟. for versicles. *italic* for rubrics.",
+      "slug": "Address (slug)",
+      "slugHelp": "Lower-case letters, numbers and hyphens, e.g. hail-mary.",
+      "category": "Category",
+      "source": "Source and licence",
+      "sortOrder": "Order in category",
+      "status": "Status",
+      "save": "Save",
+      "saving": "Saving…",
+      "delete": "Delete prayer",
+      "preview": "Preview",
+      "viewPublic": "View public page",
+      "sourceNotVerified": "not verified"
+    },
+    "result": {
+      "saved": "Saved.",
+      "invalid": "Please correct the highlighted fields.",
+      "slug_taken": "That address is already used by another prayer.",
+      "source_not_cleared": "This can't be published: its source is not verified or its licence is unknown.",
+      "forbidden": "You do not have permission to do that.",
+      "failed": "The change could not be saved."
+    },
+    "fieldError": {
+      "language_required": "Add the title and text in at least one language.",
+      "title_and_text_together": "Give both a title and a text for each language you fill in.",
+      "invalid": "Check this field."
+    }
   }
 }
