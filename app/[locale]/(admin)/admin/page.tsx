@@ -147,7 +147,7 @@ export default async function AdminDashboardPage({ params }: LocaleParams) {
                     <span className="font-medium">{t(`adminAudit.actions.${r.action}`)}</span> ·{" "}
                     {typeName(r.entity_type)} ·{" "}
                     {path ? (
-                      <Link href={path} className="text-accent hover:underline">
+                      <Link href={path} className="text-accent underline underline-offset-2">
                         {label}
                       </Link>
                     ) : (

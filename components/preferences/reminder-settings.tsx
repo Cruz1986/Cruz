@@ -4,7 +4,9 @@ import { useEffect, useState } from "react";
 import { Bell, BellOff, Send } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 import { Link } from "@/lib/i18n/navigation";
-import { getBrowserClient } from "@/lib/db/browser";
+import type { BrowserClient } from "@/lib/db/browser";
+import { hasSessionCookie } from "@/lib/personal/client";
+import { getSupabaseConfig } from "@/lib/env";
 import { sendTestNotification } from "@/lib/notifications/actions";
 import { Card, CardTitle } from "@/components/ui/card";
 import { Button, buttonClasses } from "@/components/ui/button";
@@ -61,7 +63,7 @@ async function currentSubscription() {
 export function ReminderSettings() {
   const t = useTranslations("notifications");
   const locale = useLocale();
-  const db = getBrowserClient();
+  const [db, setDb] = useState<BrowserClient | null>(null);
   const [userId, setUserId] = useState<string | null | undefined>(undefined);
   const [prefs, setPrefs] = useState<Prefs | null>(null);
   const [device, setDevice] = useState<Device>("checking");
@@ -69,14 +71,14 @@ export function ReminderSettings() {
   const [busy, setBusy] = useState(false);
 
   useEffect(() => {
-    if (!db) return;
     let cancelled = false;
     (async () => {
-      const { data } = await db.auth.getSession();
-      const id = data.session?.user.id ?? null;
+      // Signed-out readers get the sign-in prompt without loading the Supabase client.
+      const client = hasSessionCookie() ? (await import("@/lib/db/browser")).getBrowserClient() : null;
+      const id = client ? ((await client.auth.getSession()).data.session?.user.id ?? null) : null;
       let loaded: Prefs | null = null;
-      if (id) {
-        const { data: row } = await db
+      if (client && id) {
+        const { data: row } = await client
           .from("notification_preferences")
           .select("enabled, daily_reading, saint_of_day, prayer, rosary, preferred_time, timezone")
           .maybeSingle();
@@ -99,6 +101,7 @@ export function ReminderSettings() {
       else if (Notification.permission === "denied") state = "blocked";
       else state = (await currentSubscription()) ? "on" : "off";
       if (!cancelled) {
+        setDb(client);
         setUserId(id);
         setPrefs(loaded);
         setDevice(state);
@@ -107,9 +110,9 @@ export function ReminderSettings() {
     return () => {
       cancelled = true;
     };
-  }, [db]);
+  }, []);
 
-  if (!db || userId === undefined) return null;
+  if (!getSupabaseConfig() || userId === undefined) return null;
 
   if (!userId || !prefs) {
     return (

@@ -73,6 +73,14 @@ export function RosaryGuide({
     }
   }, [setKey, positions.length]);
 
+  // After a move, focus the new step's heading (once it has rendered) so screen readers announce it.
+  const moved = useRef(false);
+  useEffect(() => {
+    if (!moved.current) return;
+    moved.current = false;
+    heading.current?.focus({ preventScroll: true });
+  }, [index]);
+
   const go = useCallback(
     (next: number) => {
       if (next >= positions.length) {
@@ -84,7 +92,7 @@ export function RosaryGuide({
       setIndex(clamped);
       setResumed(false);
       save(setKey, clamped);
-      heading.current?.focus({ preventScroll: true });
+      moved.current = true;
     },
     [positions.length, setKey],
   );

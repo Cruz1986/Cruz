@@ -1,7 +1,6 @@
 /** Moves personal items between the browser store and the reader's account tables. */
-import { z } from "zod";
 import type { BrowserClient } from "@/lib/db/browser";
-import { HIGHLIGHT_COLORS, type Collection, type Store } from "./store";
+import { ITEM_CHECKS, type Collection, type Store } from "./store";
 
 const TABLES = {
   bookmarks: "bookmarks",
@@ -27,45 +26,22 @@ const SELECT: Record<Collection, string> = {
   history: "entity_type, entity_key, title, visited_at",
 };
 
-const iso = z.string().transform((v) => new Date(v).toISOString());
-const ROW: { [C in Collection]: z.ZodType<Store[C][number]> } = {
-  bookmarks: z
-    .object({
-      entity_type: z.enum(["verse", "prayer", "saint"]),
-      entity_key: z.string(),
-      canonical_vkey: z.number().nullable(),
-      created_at: iso,
-    })
-    .transform((r) => ({ type: r.entity_type, key: r.entity_key, vkey: r.canonical_vkey, at: r.created_at })),
-  highlights: z
-    .object({ canonical_vkey: z.number(), color: z.enum(HIGHLIGHT_COLORS), location: z.string(), updated_at: iso })
-    .transform((r) => ({ vkey: r.canonical_vkey, color: r.color, location: r.location, at: r.updated_at })),
-  notes: z
-    .object({
-      entity_type: z.enum(["verse", "prayer", "saint"]),
-      entity_key: z.string(),
-      canonical_vkey: z.number().nullable(),
-      body: z.string(),
-      updated_at: iso,
-    })
-    .transform((r) => ({
-      type: r.entity_type,
-      key: r.entity_key,
-      vkey: r.canonical_vkey,
-      body: r.body,
-      at: r.updated_at,
-    })),
-  favorites: z
-    .object({ entity_type: z.enum(["prayer", "saint"]), entity_key: z.string(), created_at: iso })
-    .transform((r) => ({ type: r.entity_type, key: r.entity_key, at: r.created_at })),
-  history: z
-    .object({
-      entity_type: z.enum(["chapter", "prayer", "saint"]),
-      entity_key: z.string(),
-      title: z.string(),
-      visited_at: iso,
-    })
-    .transform((r) => ({ type: r.entity_type, key: r.entity_key, title: r.title, at: r.visited_at })),
+const iso = (v: unknown) => (typeof v === "string" ? new Date(v).toISOString() : "");
+type Row = Record<string, unknown>;
+
+/** Account rows → store items (then checked like items read from the device). */
+const FROM_ROW: { [C in Collection]: (r: Row) => unknown } = {
+  bookmarks: (r) => ({ type: r.entity_type, key: r.entity_key, vkey: r.canonical_vkey ?? null, at: iso(r.created_at) }),
+  highlights: (r) => ({ vkey: r.canonical_vkey, color: r.color, location: r.location, at: iso(r.updated_at) }),
+  notes: (r) => ({
+    type: r.entity_type,
+    key: r.entity_key,
+    vkey: r.canonical_vkey ?? null,
+    body: r.body,
+    at: iso(r.updated_at),
+  }),
+  favorites: (r) => ({ type: r.entity_type, key: r.entity_key, at: iso(r.created_at) }),
+  history: (r) => ({ type: r.entity_type, key: r.entity_key, title: r.title, at: iso(r.visited_at) }),
 };
 
 /** The database row for a store item. */
@@ -98,10 +74,8 @@ export async function fetchRemote(db: BrowserClient): Promise<Omit<Store, "versi
     (Object.keys(TABLES) as Collection[]).map(async (collection) => {
       const { data, error } = await db.from(TABLES[collection]).select(SELECT[collection]).limit(5000);
       if (error) throw new Error(`${collection}: ${error.message}`);
-      const rows = (data ?? []).flatMap((row: unknown) => {
-        const parsed = ROW[collection].safeParse(row);
-        return parsed.success ? [parsed.data] : [];
-      });
+      const check = ITEM_CHECKS[collection] as (v: unknown) => boolean;
+      const rows = ((data ?? []) as unknown as Row[]).map(FROM_ROW[collection]).filter(check);
       return [collection, rows] as const;
     }),
   );

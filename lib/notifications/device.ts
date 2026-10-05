@@ -1,7 +1,5 @@
 "use client";
 
-import { getBrowserClient } from "@/lib/db/browser";
-
 /** Stops this device's push subscription and removes it from the account (on sign-out). */
 export async function stopPushOnDevice(): Promise<void> {
   try {
@@ -9,6 +7,7 @@ export async function stopPushOnDevice(): Promise<void> {
     const registration = await navigator.serviceWorker.getRegistration("/");
     const sub = registration ? await registration.pushManager.getSubscription() : null;
     if (!sub) return;
+    const { getBrowserClient } = await import("@/lib/db/browser");
     await getBrowserClient()?.from("push_subscriptions").delete().eq("endpoint", sub.endpoint);
     await sub.unsubscribe();
   } catch {

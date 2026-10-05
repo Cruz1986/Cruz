@@ -125,7 +125,7 @@ export default async function AuditPage({ params, searchParams }: Props) {
                 <p className="text-sm">
                   <span className="font-semibold">{t(`actions.${r.action}`)}</span> · {typeLabel} ·{" "}
                   {path ? (
-                    <Link href={path} className="text-accent hover:underline">
+                    <Link href={path} className="text-accent underline underline-offset-2">
                       {label}
                     </Link>
                   ) : (

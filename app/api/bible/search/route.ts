@@ -2,10 +2,12 @@ import type { NextRequest } from "next/server";
 import { createPublicClient } from "@/lib/db/public";
 import { searchBible } from "@/lib/content/bible";
 import { publicBible, defaultTranslation } from "@/lib/content/public-bible";
-import { apiError, json } from "@/lib/api";
+import { apiError, json, limitSearch } from "@/lib/api";
 
 /** GET /api/bible/search?q=…&translation=…&after=… — 20 verses per page, keyset paginated. */
 export async function GET(request: NextRequest) {
+  const limited = limitSearch(request);
+  if (limited) return limited;
   const params = request.nextUrl.searchParams;
   const q = (params.get("q") ?? "").trim();
   if (q.length < 2 || q.length > 100) return apiError(400, "invalid_query", "q must be 2–100 characters.");

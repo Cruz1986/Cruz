@@ -5,6 +5,7 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
+    "check:bundle": "node scripts/check-client-bundle.mjs",
     "start": "next start",
     "lint": "eslint",
     "typecheck": "next typegen && tsc --noEmit",
@@ -19,7 +20,8 @@
     "calendar:generate": "tsx --tsconfig tsconfig.json scripts/calendar/generate.ts",
     "import:prayers": "tsx --tsconfig tsconfig.json scripts/import/prayers.ts",
     "import:rosary": "tsx --tsconfig tsconfig.json scripts/import/rosary.ts",
-    "import:saints": "tsx --tsconfig tsconfig.json scripts/import/saints.ts"
+    "import:saints": "tsx --tsconfig tsconfig.json scripts/import/saints.ts",
+    "load-test": "node scripts/load-test.mjs"
   },
   "dependencies": {
     "@supabase/ssr": "^0.12.7",

@@ -49,7 +49,7 @@ test.describe("signed in", () => {
 
   test("content admins schedule and cancel an announcement", async ({ page, context, baseURL }) => {
     await signInAs(context, baseURL!, staffId!);
-    const title = `Test announcement ${test.info().project.name}`;
+    const title = `Test announcement ${test.info().project.name} ${Date.now()}`;
     await page.goto("/en/admin/notifications/new");
     await page.getByLabel("Title (English)").fill(title);
     await page.getByLabel("Title (Tamil)").fill("சோதனை அறிவிப்பு");

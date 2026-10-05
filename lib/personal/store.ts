@@ -6,8 +6,6 @@
  *   verse   "<translation>/<BOOK>/<chapter>/<verse>"   chapter "<translation>/<BOOK>/<chapter>"
  *   prayer / saint: slug
  */
-import { z } from "zod";
-
 export const HIGHLIGHT_COLORS = ["yellow", "green", "blue", "pink", "purple"] as const;
 export type HighlightColor = (typeof HIGHLIGHT_COLORS)[number];
 export type ItemType = "verse" | "prayer" | "saint";
@@ -17,38 +15,58 @@ export type HistoryType = "chapter" | "prayer" | "saint";
 export const HISTORY_LIMIT = 200;
 export const NOTE_LIMIT = 10_000;
 
-const at = z.string().datetime({ offset: true });
-const itemType = z.enum(["verse", "prayer", "saint"]);
-const bookmark = z.object({ type: itemType, key: z.string(), vkey: z.number().int().nullable(), at });
-const highlight = z.object({ vkey: z.number().int(), color: z.enum(HIGHLIGHT_COLORS), location: z.string(), at });
-const note = z.object({
-  type: itemType,
-  key: z.string(),
-  vkey: z.number().int().nullable(),
-  body: z.string().min(1).max(NOTE_LIMIT),
-  at,
-});
-const favorite = z.object({ type: z.enum(["prayer", "saint"]), key: z.string(), at });
-const history = z.object({ type: z.enum(["chapter", "prayer", "saint"]), key: z.string(), title: z.string(), at });
-
-export const storeSchema = z.object({
-  version: z.literal(1),
+export type Bookmark = { type: ItemType; key: string; vkey: number | null; at: string };
+export type Highlight = { vkey: number; color: HighlightColor; location: string; at: string };
+export type Note = { type: ItemType; key: string; vkey: number | null; body: string; at: string };
+export type Favorite = { type: FavoriteType; key: string; at: string };
+export type HistoryEntry = { type: HistoryType; key: string; title: string; at: string };
+export type Store = {
+  version: 1;
   /** The account this data belongs to; null while signed out. */
-  owner: z.string().nullable(),
-  bookmarks: z.array(bookmark),
-  highlights: z.array(highlight),
-  notes: z.array(note),
-  favorites: z.array(favorite),
-  history: z.array(history),
-});
-
-export type Store = z.infer<typeof storeSchema>;
-export type Bookmark = Store["bookmarks"][number];
-export type Highlight = Store["highlights"][number];
-export type Note = Store["notes"][number];
-export type Favorite = Store["favorites"][number];
-export type HistoryEntry = Store["history"][number];
+  owner: string | null;
+  bookmarks: Bookmark[];
+  highlights: Highlight[];
+  notes: Note[];
+  favorites: Favorite[];
+  history: HistoryEntry[];
+};
 export type Collection = "bookmarks" | "highlights" | "notes" | "favorites" | "history";
+
+// Small hand-written checks: this module runs on every page, so it avoids a validation library.
+type Obj = Record<string, unknown>;
+const isObj = (v: unknown): v is Obj => typeof v === "object" && v !== null && !Array.isArray(v);
+const isAt = (v: unknown): v is string => typeof v === "string" && !Number.isNaN(Date.parse(v)) && /T/.test(v);
+const isInt = (v: unknown): v is number => Number.isInteger(v);
+const oneOf = <T extends string>(v: unknown, list: readonly T[]): v is T => list.includes(v as T);
+const ITEM_TYPES = ["verse", "prayer", "saint"] as const;
+
+export const ITEM_CHECKS: { [C in Collection]: (v: unknown) => v is Store[C][number] } = {
+  bookmarks: (v): v is Bookmark =>
+    isObj(v) &&
+    oneOf(v.type, ITEM_TYPES) &&
+    typeof v.key === "string" &&
+    (v.vkey === null || isInt(v.vkey)) &&
+    isAt(v.at),
+  highlights: (v): v is Highlight =>
+    isObj(v) && isInt(v.vkey) && oneOf(v.color, HIGHLIGHT_COLORS) && typeof v.location === "string" && isAt(v.at),
+  notes: (v): v is Note =>
+    isObj(v) &&
+    oneOf(v.type, ITEM_TYPES) &&
+    typeof v.key === "string" &&
+    (v.vkey === null || isInt(v.vkey)) &&
+    typeof v.body === "string" &&
+    v.body.length >= 1 &&
+    v.body.length <= NOTE_LIMIT &&
+    isAt(v.at),
+  favorites: (v): v is Favorite =>
+    isObj(v) && oneOf(v.type, ["prayer", "saint"] as const) && typeof v.key === "string" && isAt(v.at),
+  history: (v): v is HistoryEntry =>
+    isObj(v) &&
+    oneOf(v.type, ["chapter", "prayer", "saint"] as const) &&
+    typeof v.key === "string" &&
+    typeof v.title === "string" &&
+    isAt(v.at),
+};
 
 export const emptyStore = (owner: string | null = null): Store => ({
   version: 1,
@@ -84,26 +102,19 @@ export function parseLocation(
   return m ? { translation: m[1], book: m[2], chapter: Number(m[3]), verse: m[4] ? Number(m[4]) : null } : null;
 }
 
-/** Reads stored JSON, dropping anything malformed instead of failing. */
+/** Reads stored JSON, keeping every valid item and dropping anything malformed instead of failing. */
 export function parseStore(raw: string | null): Store {
   if (!raw) return emptyStore();
   try {
     const value: unknown = JSON.parse(raw);
-    const parsed = storeSchema.safeParse(value);
-    if (parsed.success) return clean(parsed.data);
-    // Keep the valid items of a partly broken store.
-    const base = emptyStore(
-      typeof value === "object" && value && typeof (value as { owner?: unknown }).owner === "string"
-        ? (value as { owner: string }).owner
-        : null,
-    );
-    const pick = <K extends Collection>(name: K) => {
-      const list = (value as Record<string, unknown>)?.[name];
-      const item = storeSchema.shape[name].element;
-      return (Array.isArray(list) ? list.flatMap((x) => (item.safeParse(x).success ? [x] : [])) : []) as Store[K];
+    if (!isObj(value)) return emptyStore();
+    const pick = <C extends Collection>(name: C) => {
+      const list = value[name];
+      return (Array.isArray(list) ? list.filter(ITEM_CHECKS[name]) : []) as Store[C];
     };
     return clean({
-      ...base,
+      version: 1,
+      owner: typeof value.owner === "string" ? value.owner : null,
       bookmarks: pick("bookmarks"),
       highlights: pick("highlights"),
       notes: pick("notes"),

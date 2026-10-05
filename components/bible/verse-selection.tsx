@@ -47,7 +47,6 @@ export function VerseSelection({
       const verse = Number(el.dataset.verse);
       const on = selected.some((s) => s.verse === verse);
       el.toggleAttribute("data-selected", on);
-      el.setAttribute("aria-selected", String(on));
       const color = el.dataset.key ? highlights.get(el.dataset.key) : undefined;
       if (color) el.dataset.highlight = color;
       else delete el.dataset.highlight;

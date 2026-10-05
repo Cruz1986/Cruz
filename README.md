@@ -61,4 +61,8 @@ pnpm db:test      # database migrations + pgTAP tests (needs local PostgreSQL + 
   choose (Gospel, saint of the day, Rosary, a prayer for the hour), one notification in their language; device
   opt-in with Web Push and a test button; announcements scheduled by content admins; a scheduled job that sends
   each reminder once; delivery behind a provider interface (Web Push or log).
-- Next: Phase 14 (testing, performance and security).
+- Phase 14 (testing, performance and security): done. Security headers and CSP, RLS and function checks over the
+  whole database, a client-bundle secret check in CI, search rate limits; JavaScript per page roughly halved and
+  Bible search up to 140× faster; accessibility checks on every section and the admin; page-weight budgets and a
+  load test. See docs/SECURITY.md and docs/QUALITY.md.
+- Next: Phase 15 (production deployment).

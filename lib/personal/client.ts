@@ -1,7 +1,7 @@
 "use client";
 
 import { useSyncExternalStore } from "react";
-import { getBrowserClient } from "@/lib/db/browser";
+import type { BrowserClient } from "@/lib/db/browser";
 import {
   emptyStore,
   merge,
@@ -15,7 +15,6 @@ import {
   type HistoryType,
   type Store,
 } from "./store";
-import { clearCollection, deleteItem, fetchRemote, pushItems } from "./sync";
 
 /**
  * The personal library in the browser. Kept in local storage so it works without an account;
@@ -87,25 +86,46 @@ export function useSyncState(): typeof account {
   );
 }
 
+type Sync = typeof import("./sync");
+let accountCode: Promise<{ db: BrowserClient | null; sync: Sync }> | null = null;
+
+/**
+ * The account side (Supabase client and sync) is loaded only for signed-in readers, so pages stay light for
+ * everyone else.
+ */
+function loadAccountCode() {
+  accountCode ??= Promise.all([import("@/lib/db/browser"), import("./sync")]).then(([browser, sync]) => ({
+    db: browser.getBrowserClient(),
+    sync,
+  }));
+  return accountCode;
+}
+
+/** A Supabase session cookie (possibly split into chunks) is present. */
+export function hasSessionCookie(): boolean {
+  return /(^|;\s*)sb-[^=;]+-auth-token(\.\d+)?=/.test(document.cookie);
+}
+
 /** Writes to the account in the background; the device copy is already saved. */
-function remote(task: (db: NonNullable<ReturnType<typeof getBrowserClient>>, userId: string) => Promise<void>) {
-  const db = getBrowserClient();
+function remote(task: (db: BrowserClient, userId: string, sync: Sync) => Promise<void>) {
   const userId = account.userId;
-  if (!db || !userId) return;
-  task(db, userId).then(
-    () => setAccount({ status: "synced" }),
-    () => setAccount({ status: "error" }),
-  );
+  if (!userId) return;
+  loadAccountCode()
+    .then(({ db, sync }) => (db ? task(db, userId, sync) : undefined))
+    .then(
+      () => setAccount({ status: "synced" }),
+      () => setAccount({ status: "error" }),
+    );
 }
 
 function save<C extends Collection>(collection: C, item: Store[C][number]) {
   write(upsert(read(), collection, item));
-  remote((db, userId) => pushItems(db, userId, collection, [item] as Store[C]));
+  remote((db, userId, sync) => sync.pushItems(db, userId, collection, [item] as Store[C]));
 }
 
 function drop<C extends Collection>(collection: C, item: Store[C][number]) {
   write(remove(read(), collection, item));
-  remote((db) => deleteItem(db, collection, item));
+  remote((db, _userId, sync) => sync.deleteItem(db, collection, item));
 }
 
 const now = () => new Date().toISOString();
@@ -145,7 +165,7 @@ export const personal = {
   },
   clear(collection: Collection) {
     write({ ...read(), [collection]: [] });
-    remote((db) => clearCollection(db, collection));
+    remote((db, _userId, sync) => sync.clearCollection(db, collection));
   },
   /** Forgets the account's data on this device (on sign-out). */
   forgetDevice() {
@@ -187,8 +207,7 @@ function migrateLegacy() {
 }
 
 /** Matches the device with the signed-in account (or forgets the account's data after sign-out). */
-async function syncWith(userId: string | null) {
-  const db = getBrowserClient();
+async function syncWith(db: BrowserClient | null, sync: Sync, userId: string | null) {
   if (!db || !userId) {
     if (read().owner) write(emptyStore());
     setAccount({ userId: null, status: "local" });
@@ -198,10 +217,10 @@ async function syncWith(userId: string | null) {
   const local = read();
   const mine = local.owner && local.owner !== userId ? emptyStore() : local;
   try {
-    const { store, push } = merge(mine, await fetchRemote(db), userId);
+    const { store, push } = merge(mine, await sync.fetchRemote(db), userId);
     write(store);
     await Promise.all(
-      (Object.keys(push) as Collection[]).map((c) => pushItems(db, userId, c, push[c] as Store[typeof c])),
+      (Object.keys(push) as Collection[]).map((c) => sync.pushItems(db, userId, c, push[c] as Store[typeof c])),
     );
     setAccount({ status: "synced" });
   } catch {
@@ -216,18 +235,28 @@ export function startPersonalSync(): () => void {
   if (started) return () => {};
   started = true;
   migrateLegacy();
-  const db = getBrowserClient();
-  if (!db) return () => {};
+  if (!hasSessionCookie()) {
+    // Signed out: an account's library does not stay on the device.
+    if (read().owner) write(emptyStore());
+    return () => {
+      started = false;
+    };
+  }
+  let unsubscribe = () => {};
   let current: string | null | undefined;
-  const run = (userId: string | null) => {
-    if (userId === current) return;
-    current = userId;
-    void syncWith(userId);
-  };
-  void db.auth.getSession().then(({ data }) => run(data.session?.user.id ?? null));
-  const { data } = db.auth.onAuthStateChange((_event, session) => run(session?.user.id ?? null));
+  void loadAccountCode().then(({ db, sync }) => {
+    if (!db) return;
+    const run = (userId: string | null) => {
+      if (userId === current) return;
+      current = userId;
+      void syncWith(db, sync, userId);
+    };
+    void db.auth.getSession().then(({ data }) => run(data.session?.user.id ?? null));
+    const { data } = db.auth.onAuthStateChange((_event, session) => run(session?.user.id ?? null));
+    unsubscribe = () => data.subscription.unsubscribe();
+  });
   return () => {
     started = false;
-    data.subscription.unsubscribe();
+    unsubscribe();
   };
 }

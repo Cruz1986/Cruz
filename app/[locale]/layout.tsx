@@ -11,15 +11,19 @@ import { SkipLink } from "@/components/layout/skip-link";
 import "../globals.css";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter", display: "swap" });
+// Not preloaded: each file declares its Unicode range, so browsers fetch it only for pages that use it
+// (English pages without Tamil reading text skip the Tamil serif).
 const notoSansTamil = Noto_Sans_Tamil({
   subsets: ["tamil"],
   variable: "--font-noto-sans-tamil",
   display: "swap",
+  preload: false,
 });
 const notoSerifTamil = Noto_Serif_Tamil({
   subsets: ["tamil", "latin"],
   variable: "--font-noto-serif-tamil",
   display: "swap",
+  preload: false,
 });
 
 type Props = { children: ReactNode; params: Promise<{ locale: string }> };

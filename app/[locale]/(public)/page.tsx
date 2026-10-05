@@ -70,7 +70,7 @@ export default async function HomePage({ params }: LocaleParams) {
             {gospelText.map((v) => v.text.replace(/\n/g, " ")).join(" ")}
           </p>
         ) : (
-          <p className="reading text-fg-muted mt-3">{t("home.gospelEmpty")}</p>
+          <p className="text-fg-muted mt-3">{t("home.gospelEmpty")}</p>
         )}
         <Link href={NAV_ITEMS.today.href} className={buttonClasses({ className: "mt-5" })}>
           {t("home.read")}

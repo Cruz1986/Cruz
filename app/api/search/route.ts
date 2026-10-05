@@ -2,13 +2,15 @@ import type { NextRequest } from "next/server";
 import { siteSearch } from "@/lib/content/search";
 import { DEFAULT_TIME_ZONE } from "@/lib/i18n/request";
 import { todayIn, toIso } from "@/lib/liturgy/plain-date";
-import { apiError, json } from "@/lib/api";
+import { apiError, json, limitSearch } from "@/lib/api";
 
 /**
  * GET /api/search?q=&lang=ta — a Bible reference (with upcoming days its passage is read at Mass),
  * matching verses, prayers, saints, Rosary mysteries, reflections and celebrations.
  */
 export async function GET(request: NextRequest) {
+  const limited = limitSearch(request);
+  if (limited) return limited;
   const params = request.nextUrl.searchParams;
   const q = (params.get("q") ?? "").trim();
   if (q.length < 2) return apiError(400, "query_too_short", "q must have at least 2 characters.");
