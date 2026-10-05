@@ -3,7 +3,7 @@
 Response to the "First action — no coding" step of the master prompt in [PRD.md](./PRD.md) §22.
 No application code has been written. Implementation starts only after this plan is approved.
 
-Status: **approved 2026-10-05** · Phase 1 implemented
+Status: **approved 2026-10-05** · Phases 1–2 implemented
 
 ---
 
@@ -357,3 +357,13 @@ This follows the PRD's 15 phases. Each phase ends with typecheck, lint, tests, a
 | Q6  | MVP accounts   | Open. Default: staff-only auth in MVP, personal features in V1.1                                                |
 
 Defaults apply until you say otherwise. Data sources are evaluated in [CONTENT_RIGHTS.md](CONTENT_RIGHTS.md).
+
+## Changes made during implementation
+
+| Planned (§J)                      | Built (Phase 2)                                                                        | Why                                                                                |
+| --------------------------------- | -------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------- |
+| `content_revisions` table         | `content_audit_log` stores before/after of every change and serves as revision history | One mechanism instead of two                                                       |
+| `bible_books` = 73 books          | 73 + `ESG` / `DAG` supplements, and per-translation order in `bible_translation_books` | The Tamil Bible prints the Greek additions as separate books, in a different order |
+| `canonical_key` text              | `canonical_vkey` integer                                                               | Compact, and verse ranges become simple `between` queries                          |
+| `reflections.day_id`              | `reflections.reflection_date`                                                          | Regenerating calendar days must never orphan reflections                           |
+| `rosary_steps.prayer_id` required | Nullable: a step without a prayer means "announce the mystery"                         | The guided flow needs that step                                                    |

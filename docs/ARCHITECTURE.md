@@ -5,7 +5,7 @@ Target design: [ANALYSIS.md](ANALYSIS.md) §H–K. This file describes what is b
 ## Stack
 
 Next.js 16 (App Router, Turbopack) · React 19 · TypeScript strict · Tailwind CSS v4 · next-intl 4 · Vitest.
-Supabase (Postgres, Auth, Storage) arrives in Phase 2–3.
+Supabase Postgres schema: see [DATABASE.md](DATABASE.md). Auth and Storage wiring arrive in Phase 3.
 
 ## Layout
 
@@ -27,6 +27,8 @@ lib/
   preferences/              # pure preference helpers + pre-paint script
   design/                   # liturgical colours
 messages/ta.json, en.json   # UI strings (keys must match; enforced by tests)
+supabase/                   # migrations, seed, pgTAP tests (see DATABASE.md)
+scripts/db/test.sh          # local database test runner
 proxy.ts                    # next-intl locale negotiation (Next 16 "proxy", formerly middleware)
 ```
 

@@ -21,3 +21,19 @@ jobs:
       - run: pnpm test
       - run: pnpm format:check
       - run: pnpm build
+
+  database:
+    runs-on: ubuntu-24.04
+    env:
+      PGHOST: /var/run/postgresql
+      PGUSER: postgres
+    steps:
+      - uses: actions/checkout@v4
+      - name: Start PostgreSQL with pgTAP
+        run: |
+          sudo apt-get update -q
+          sudo apt-get install -y -q postgresql-16 postgresql-16-pgtap libtap-parser-sourcehandler-pgtap-perl
+          sudo systemctl start postgresql.service
+          sudo sed -i 's/^local\s\+all\s\+postgres\s\+peer/local all postgres trust/' /etc/postgresql/16/main/pg_hba.conf
+          sudo systemctl reload postgresql.service
+      - run: scripts/db/test.sh
