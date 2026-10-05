@@ -112,6 +112,23 @@ app/api/prayers[/slug]        JSON API
 - Saving revalidates the public prayer pages in both languages straight away.
 - Favourites are kept on the device until accounts arrive (Phase 10).
 
+## Rosary
+
+```text
+lib/rosary/sequence.ts        step list → every prayer in order, decade starts, saved progress, today's set (unit tested)
+lib/rosary/today.ts           today's set from the weekday and the liturgical season (India time zone)
+lib/content/rosary.ts         sets, mysteries, steps and their prayers (null unless everything needed is published)
+app/[locale]/(public)/rosary  today's mysteries first, the four sets, "continue where you left off"
+app/[locale]/(public)/rosary/[set]  guided Rosary: one prayer at a time, bead counter, decade jumps, pause
+app/api/rosary/[set]          JSON API (`today` for today's set)
+```
+
+- Sets follow the usual weekdays; on Sundays of Advent and Christmas the Joyful, and of Lent the Sorrowful
+  mysteries are prayed.
+- Progress is kept on the device for 24 hours (`rosary:progress` in local storage) and focus moves to each new
+  prayer for screen readers. Arrow keys and the space bar move between prayers.
+- Prayers come from the prayer library, so a Tamil text added there appears in the Rosary too.
+
 ## Authentication and roles
 
 ```text

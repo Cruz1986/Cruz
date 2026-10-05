@@ -17,7 +17,8 @@
     "import:bible": "tsx scripts/import/bible.ts",
     "import:lectionary": "tsx --tsconfig tsconfig.json scripts/import/lectionary.ts",
     "calendar:generate": "tsx --tsconfig tsconfig.json scripts/calendar/generate.ts",
-    "import:prayers": "tsx --tsconfig tsconfig.json scripts/import/prayers.ts"
+    "import:prayers": "tsx --tsconfig tsconfig.json scripts/import/prayers.ts",
+    "import:rosary": "tsx --tsconfig tsconfig.json scripts/import/rosary.ts"
   },
   "dependencies": {
     "@supabase/ssr": "^0.12.7",

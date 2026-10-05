@@ -39,6 +39,9 @@ Other sources:
 | Douay-Rheims (`en-drc`)      | Yes      | Yes    | Public domain                                             |
 | திருவிவிலியம் (`ta-tcb2012`) | Yes      | **No** | Permission pending. Staff can preview it in Admin → Bible |
 
+Prayers in the library are traditional public-domain English texts. The Rosary's mystery titles, fruits and
+meditations (`data/import/rosary/rosary.json`) were written for this project; only Scripture references are cited.
+
 ## Other planned sources
 
 | Content                                      | Plan                                                                |

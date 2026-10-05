@@ -1,0 +1,200 @@
+{
+  "source": {
+    "name": "Original texts written for this project",
+    "licenseType": "original",
+    "permissionStatus": "verified",
+    "attribution": "Original text written for this app.",
+    "notes": "Rosary meditations and Tamil mystery titles written for this project. Tamil titles need native review."
+  },
+  "steps": [
+    { "phase": "opening", "prayer": "sign-of-the-cross", "repeat": 1 },
+    { "phase": "opening", "prayer": "apostles-creed", "repeat": 1 },
+    { "phase": "opening", "prayer": "our-father", "repeat": 1 },
+    {
+      "phase": "opening",
+      "prayer": "hail-mary",
+      "repeat": 3,
+      "label_en": "For an increase of faith, hope and love",
+      "label_ta": "விசுவாசம், நம்பிக்கை, அன்பு வளர"
+    },
+    { "phase": "opening", "prayer": "glory-be", "repeat": 1 },
+    { "phase": "decade", "prayer": null, "repeat": 1 },
+    { "phase": "decade", "prayer": "our-father", "repeat": 1 },
+    { "phase": "decade", "prayer": "hail-mary", "repeat": 10 },
+    { "phase": "decade", "prayer": "glory-be", "repeat": 1 },
+    { "phase": "decade", "prayer": "fatima-prayer", "repeat": 1 },
+    { "phase": "closing", "prayer": "hail-holy-queen", "repeat": 1 },
+    { "phase": "closing", "prayer": "rosary-concluding-prayer", "repeat": 1 },
+    { "phase": "closing", "prayer": "sign-of-the-cross", "repeat": 1 }
+  ],
+  "mysteries": {
+    "joyful": [
+      {
+        "title_en": "The Annunciation",
+        "title_ta": "கபிரியேல் தூதர் மரியாவுக்கு மங்கள செய்தி அறிவித்தல்",
+        "scripture": "Luke 1:26-38",
+        "fruit_en": "Humility",
+        "fruit_ta": "தாழ்ச்சி",
+        "meditation_en": "An angel greets a young woman in Nazareth, and she answers God with a simple yes. Her trust opens the way for the Word to become flesh. Ask for the humility to say yes to God in the plain events of today."
+      },
+      {
+        "title_en": "The Visitation",
+        "title_ta": "மரியா எலிசபெத்தைச் சந்தித்தல்",
+        "scripture": "Luke 1:39-56",
+        "fruit_en": "Love of neighbour",
+        "fruit_ta": "பிறரன்பு",
+        "meditation_en": "Mary hurries across the hill country to help her cousin, carrying Christ with her. Elizabeth's child leaps for joy. Think of someone who needs your help or your company, and bring Christ to them."
+      },
+      {
+        "title_en": "The Nativity of Jesus",
+        "title_ta": "இயேசுவின் பிறப்பு",
+        "scripture": "Luke 2:1-20",
+        "fruit_en": "Poverty of spirit",
+        "fruit_ta": "எளிமை",
+        "meditation_en": "The Son of God is born in a stable and laid in a manger. Shepherds, not kings, are the first to come. Ask for a heart that is free enough to welcome God in small and humble things."
+      },
+      {
+        "title_en": "The Presentation in the Temple",
+        "title_ta": "இயேசுவைக் கோவிலில் காணிக்கையாக்குதல்",
+        "scripture": "Luke 2:22-38",
+        "fruit_en": "Obedience",
+        "fruit_ta": "கீழ்ப்படிதல்",
+        "meditation_en": "Mary and Joseph bring the child to the Temple as the Law asks. Simeon and Anna, who waited all their lives, recognise him. Pray for patience and faithfulness in what you are waiting for."
+      },
+      {
+        "title_en": "The Finding of Jesus in the Temple",
+        "title_ta": "காணாமற்போன இயேசுவைக் கோவிலில் கண்டடைதல்",
+        "scripture": "Luke 2:41-52",
+        "fruit_en": "Joy in finding Jesus",
+        "fruit_ta": "இயேசுவைக் கண்டடையும் மகிழ்ச்சி",
+        "meditation_en": "After three days of searching, Mary and Joseph find Jesus in his Father's house. Remember the times you have felt far from God, and ask for the grace to seek him until you find him."
+      }
+    ],
+    "luminous": [
+      {
+        "title_en": "The Baptism of the Lord",
+        "title_ta": "யோர்தானில் இயேசுவின் திருமுழுக்கு",
+        "scripture": "Matthew 3:13-17",
+        "fruit_en": "Openness to the Holy Spirit",
+        "fruit_ta": "தூய ஆவிக்குத் திறந்த உள்ளம்",
+        "meditation_en": "Jesus stands in line with sinners at the Jordan. The heavens open and the Father calls him beloved. Give thanks for your own baptism, through which you too are a beloved child of God."
+      },
+      {
+        "title_en": "The Wedding at Cana",
+        "title_ta": "கானா திருமணத்தில் இயேசு தம்மை வெளிப்படுத்துதல்",
+        "scripture": "John 2:1-12",
+        "fruit_en": "To Jesus through Mary",
+        "fruit_ta": "மரியா வழியாக இயேசுவிடம்",
+        "meditation_en": "Mary notices that the wine has run out and tells the servants, \"Do whatever he tells you.\" Bring your own needs to Jesus through her, and listen for what he asks of you."
+      },
+      {
+        "title_en": "The Proclamation of the Kingdom",
+        "title_ta": "இறையாட்சியை அறிவித்து மனமாற அழைத்தல்",
+        "scripture": "Mark 1:14-15",
+        "fruit_en": "Conversion of heart",
+        "fruit_ta": "மனமாற்றம்",
+        "meditation_en": "Jesus announces that the kingdom of God is near and calls people to repent and believe. Ask what in your life still needs to turn towards him, and trust his mercy."
+      },
+      {
+        "title_en": "The Transfiguration",
+        "title_ta": "இயேசுவின் தோற்றமாற்றம்",
+        "scripture": "Luke 9:28-36",
+        "fruit_en": "Desire for holiness",
+        "fruit_ta": "தூய வாழ்வுக்கான ஆவல்",
+        "meditation_en": "On the mountain the disciples see Jesus shining with glory, and hear the Father say, \"Listen to him.\" Ask for the grace to listen to Jesus, especially when the way ahead is hard."
+      },
+      {
+        "title_en": "The Institution of the Eucharist",
+        "title_ta": "நற்கருணையை ஏற்படுத்துதல்",
+        "scripture": "Luke 22:14-20",
+        "fruit_en": "Love of the Eucharist",
+        "fruit_ta": "நற்கருணை மீது அன்பு",
+        "meditation_en": "At the Last Supper Jesus gives himself as bread broken and blood poured out. Thank him for every Mass, and ask to receive him with a grateful and prepared heart."
+      }
+    ],
+    "sorrowful": [
+      {
+        "title_en": "The Agony in the Garden",
+        "title_ta": "கெத்சமனித் தோட்டத்தில் இயேசுவின் வேதனை",
+        "scripture": "Luke 22:39-46",
+        "fruit_en": "Sorrow for sin",
+        "fruit_ta": "பாவத்திற்காக மனம் வருந்துதல்",
+        "meditation_en": "In the garden Jesus prays in anguish, \"Not my will, but yours be done.\" His friends fall asleep. Stay awake with him for a moment, and offer him the burdens you are carrying."
+      },
+      {
+        "title_en": "The Scourging at the Pillar",
+        "title_ta": "இயேசுவைக் கசையால் அடித்தல்",
+        "scripture": "John 19:1",
+        "fruit_en": "Purity",
+        "fruit_ta": "தூய்மை",
+        "meditation_en": "Jesus is stripped and beaten, and bears it in silence. Pray for all who suffer violence today, and for the grace to respect your own body and the bodies of others."
+      },
+      {
+        "title_en": "The Crowning with Thorns",
+        "title_ta": "இயேசுவுக்கு முள்முடி சூட்டுதல்",
+        "scripture": "Matthew 27:27-31",
+        "fruit_en": "Courage",
+        "fruit_ta": "மனத்துணிவு",
+        "meditation_en": "Soldiers mock Jesus as a king with a crown of thorns. He who is truly King accepts their contempt. Ask for the courage to stay faithful when you are misunderstood or laughed at."
+      },
+      {
+        "title_en": "The Carrying of the Cross",
+        "title_ta": "இயேசு சிலுவை சுமந்து செல்லுதல்",
+        "scripture": "Luke 23:26-32",
+        "fruit_en": "Patience",
+        "fruit_ta": "பொறுமை",
+        "meditation_en": "Jesus carries his cross to Calvary, and Simon of Cyrene is made to help him. Think of the crosses in your own life, and of someone whose burden you could help to carry."
+      },
+      {
+        "title_en": "The Crucifixion and Death of Jesus",
+        "title_ta": "இயேசு சிலுவையில் உயிர் துறத்தல்",
+        "scripture": "Luke 23:33-46",
+        "fruit_en": "Self-giving love",
+        "fruit_ta": "தன்னையே கையளிக்கும் அன்பு",
+        "meditation_en": "On the cross Jesus forgives those who crucify him and entrusts his spirit to the Father. Stand with Mary at the foot of the cross, and let his love reach the places you find hardest to forgive."
+      }
+    ],
+    "glorious": [
+      {
+        "title_en": "The Resurrection",
+        "title_ta": "இயேசுவின் உயிர்ப்பு",
+        "scripture": "Mark 16:1-7",
+        "fruit_en": "Faith",
+        "fruit_ta": "விசுவாசம்",
+        "meditation_en": "The women find the tomb empty and hear, \"He has been raised.\" Death does not have the last word. Ask for a living faith in the risen Lord, who is with you now."
+      },
+      {
+        "title_en": "The Ascension",
+        "title_ta": "இயேசுவின் விண்ணேற்றம்",
+        "scripture": "Acts 1:6-11",
+        "fruit_en": "Hope",
+        "fruit_ta": "நம்பிக்கை",
+        "meditation_en": "Jesus returns to the Father and sends his disciples to be his witnesses. Lift your eyes to the home he has prepared, and ask for the hope that makes you a witness where you are."
+      },
+      {
+        "title_en": "The Descent of the Holy Spirit",
+        "title_ta": "தூய ஆவியின் வருகை",
+        "scripture": "Acts 2:1-13",
+        "fruit_en": "Love of God",
+        "fruit_ta": "இறையன்பு",
+        "meditation_en": "The Holy Spirit comes upon Mary and the apostles, and they speak of God's deeds in every language. Pray for the Church, and ask the Spirit to give you the words and the love to share the faith."
+      },
+      {
+        "title_en": "The Assumption of Mary",
+        "title_ta": "மரியாவின் விண்ணேற்பு",
+        "scripture": "Luke 1:46-55",
+        "fruit_en": "Grace of a holy death",
+        "fruit_ta": "நல்ல மரணத்தின் அருள்",
+        "meditation_en": "Mary, who gave her whole life to God, is taken body and soul into heaven. She goes before us as a sign of hope. Ask her to stay close to you and to all who are dying today."
+      },
+      {
+        "title_en": "The Coronation of Mary",
+        "title_ta": "மரியா விண்ணக மண்ணக அரசியாக முடிசூட்டப்படுதல்",
+        "scripture": "Revelation 12:1",
+        "fruit_en": "Trust in Mary's intercession",
+        "fruit_ta": "மரியாவின் பரிந்துரையில் நம்பிக்கை",
+        "meditation_en": "Mary is honoured as Queen of heaven and earth, a mother who reigns by serving. Entrust to her the people you love and the needs of the world."
+      }
+    ]
+  }
+}

@@ -38,4 +38,7 @@ pnpm db:test      # database migrations + pgTAP tests (needs local PostgreSQL + 
 - Phase 7 (prayers): done. Prayer library by category with search, prayer pages (Tamil first when available),
   copy, share and device favourites; admin create, edit, review, publish and delete; 20 public-domain English
   prayers. Tamil prayer texts are waiting for a source with clear rights.
-- Next: Phase 8 (Rosary).
+- Phase 8 (Rosary): done. Guided Rosary for all four sets of mysteries, today's set by weekday and season,
+  bead counter, decade jumps, keyboard control, pause and resume on the device, Scripture links, original
+  meditations, `/api/rosary/[set]` (and `/api/rosary/today`). Tamil mystery titles need review.
+- Next: Phase 9 (Saints).

@@ -376,5 +376,46 @@
       "title_and_text_together": "Give both a title and a text for each language you fill in.",
       "invalid": "Check this field."
     }
+  },
+  "rosary": {
+    "todaysMysteries": "Today's mysteries",
+    "pray": "Pray the {name}",
+    "prayShort": "Pray",
+    "resume": "Continue where you left off",
+    "resumeDetail": "{name} · {progress}",
+    "weekdays": "Prayed on {days}",
+    "mysteries": "Mysteries",
+    "unavailable": "The Rosary is not available yet.",
+    "unavailableBody": "It appears here once its prayers and mysteries have been published.",
+    "ordinal": {
+      "1": "First Mystery",
+      "2": "Second Mystery",
+      "3": "Third Mystery",
+      "4": "Fourth Mystery",
+      "5": "Fifth Mystery"
+    },
+    "phase": {
+      "opening": "Opening prayers",
+      "closing": "Closing prayers"
+    },
+    "decadeOf": "Decade {decade} of 5",
+    "countOf": "{title} {count} of {of}",
+    "scripture": "Scripture: {reference}",
+    "fruit": "Fruit of the mystery: {fruit}",
+    "announce": "Announce the mystery and reflect for a moment.",
+    "previous": "Previous",
+    "next": "Next",
+    "pause": "Pause",
+    "startOver": "Start over",
+    "resumed": "Continuing where you left off.",
+    "progress": "{done} of {total} prayers",
+    "finished": "You have finished the Rosary.",
+    "finishedBody": "May Mary, Mother of God, pray for us.",
+    "prayAgain": "Pray again",
+    "backToRosary": "All mysteries",
+    "keyboardHint": "Tip: use the arrow keys or the space bar to move on.",
+    "jumpToDecade": "Go to decade {decade}",
+    "prayerMissing": "This prayer is not available in your language yet.",
+    "source": "Meditations: {attribution}"
   }
 }

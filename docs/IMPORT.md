@@ -49,6 +49,17 @@ domain), curated for this project, including everything the Rosary needs. Prayer
 fields in the file are written, so Tamil texts added by editors in the admin survive a re-import. Prayer text uses a
 small format (lines, paragraphs, ℣/℟, _italic_, **bold**), described in `lib/prayers/markup.ts`.
 
+## Rosary
+
+```bash
+pnpm import:rosary --path data/import/rosary/rosary.json --publish
+```
+
+Run it after the prayers import: each step of the Rosary points to a prayer by slug. The file holds the order
+of prayers (opening, each decade, closing) and the twenty mysteries with their Scripture references, fruits and
+short meditations. The meditations and mystery titles were written for this project. Mysteries are upserted by
+set and number; the steps are replaced on every run.
+
 ## Lectionary and calendar
 
 The Today page needs two steps after the Bible import:
