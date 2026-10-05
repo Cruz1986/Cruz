@@ -62,7 +62,11 @@ export default async function AdminBiblePage({ params }: LocaleParams) {
 
   return (
     <>
-      <PageHeader title={t("admin.bible")} description={t("admin.translations")} />
+      <PageHeader title={t("admin.bible")} description={t("admin.translations")}>
+        <Link href="/admin/bible/books" className={buttonClasses({ variant: "secondary", size: "sm" })}>
+          {t("adminBible.books")}
+        </Link>
+      </PageHeader>
       {translations.length === 0 ? (
         <EmptyState icon={BookOpen} title={t("admin.noTranslations")} />
       ) : (
@@ -94,6 +98,12 @@ export default async function AdminBiblePage({ params }: LocaleParams) {
                 >
                   {t(`status.${tr.content_sources.permission_status}`)}
                 </span>
+                <Link
+                  href={`/admin/bible/${tr.code}/settings`}
+                  className={buttonClasses({ variant: "secondary", size: "sm" })}
+                >
+                  {t("adminCommon.edit")}
+                </Link>
                 <Link
                   href={`/admin/bible/${tr.code}/jhn/1`}
                   className={buttonClasses({ variant: "secondary", size: "sm" })}

@@ -94,14 +94,20 @@ async function main() {
           type_code: m.type,
         })),
       ];
-      const celebrations = await tx<{ id: string; code: string }[]>`
+      // Names edited in the admin (names_locked) are kept.
+      const celebrations = await tx<
+        { id: string; code: string; name_en: string; name_ta: string; names_locked: boolean }[]
+      >`
         insert into public.celebrations ${tx(celebrationRows)}
         on conflict (code) do update set
-          name_en = excluded.name_en, name_ta = excluded.name_ta, rank = excluded.rank, precedence = excluded.precedence,
+          name_en = case when celebrations.names_locked then celebrations.name_en else excluded.name_en end,
+          name_ta = case when celebrations.names_locked then celebrations.name_ta else excluded.name_ta end,
+          rank = excluded.rank, precedence = excluded.precedence,
           color = excluded.color, month = excluded.month, day = excluded.day, added_year = excluded.added_year,
           removed_year = excluded.removed_year, type_code = excluded.type_code
-        returning id, code`;
+        returning id, code, name_en, name_ta, names_locked`;
       const celebrationIds = new Map(celebrations.map((c) => [c.code, c.id]));
+      const lockedNames = new Map(celebrations.filter((c) => c.names_locked).map((c) => [c.code, c]));
       const setIds = new Map(
         (await tx<{ id: string; code: string }[]>`select id, code from public.lectionary_sets`).map((s) => [
           s.code,
@@ -138,8 +144,8 @@ async function main() {
             color: d.color,
             day_code: d.celebrations[0].code,
             ferial_code: d.ferialCode,
-            title_en: d.celebrations[0].titleEn,
-            title_ta: d.celebrations[0].titleTa,
+            title_en: lockedNames.get(d.celebrations[0].code)?.name_en ?? d.celebrations[0].titleEn,
+            title_ta: lockedNames.get(d.celebrations[0].code)?.name_ta ?? d.celebrations[0].titleTa,
             precedence: d.celebrations[0].rank,
             kind: d.celebrations[0].kind,
           }));

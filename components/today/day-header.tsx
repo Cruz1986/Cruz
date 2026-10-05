@@ -40,6 +40,11 @@ export async function DayHeader({ day, headingLevel = 1 }: { day: Today; heading
         </span>
         <span>{t("cycles", { sunday: day.sundayCycle, weekday: day.weekdayCycle })}</span>
       </div>
+      {(locale === "ta" ? (day.notesTa ?? day.notesEn) : (day.notesEn ?? day.notesTa)) ? (
+        <p className="border-gold/40 bg-surface rounded-xl border p-3 text-sm whitespace-pre-line">
+          {locale === "ta" ? (day.notesTa ?? day.notesEn) : (day.notesEn ?? day.notesTa)}
+        </p>
+      ) : null}
       {primarySaint ? (
         <Link
           href={`/saints/${primarySaint}`}

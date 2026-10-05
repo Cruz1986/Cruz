@@ -84,9 +84,17 @@ async function main() {
           on conflict (code) do update set updated_at = now()
           returning id, code`;
         const setIds = new Map(setRows.map((s) => [s.code, s.id]));
-        await tx`delete from public.lectionary_readings where set_id = any(${[...setIds.values()]}::uuid[])`;
+        // Readings corrected in the admin (is_edited) are kept; everything else is replaced.
+        await tx`delete from public.lectionary_readings where set_id = any(${[...setIds.values()]}::uuid[]) and not is_edited`;
+        const edited = new Set(
+          (
+            await tx<{ set_id: string; source_type: string }[]>`
+              select set_id, source_type from public.lectionary_readings where set_id = any(${[...setIds.values()]}::uuid[])`
+          ).map((r) => `${r.set_id}|${r.source_type}`),
+        );
+        const fresh = decoded.filter((d) => !edited.has(`${setIds.get(d.set)}|${d.type}`));
 
-        const readingRows = decoded.map((d) => ({
+        const readingRows = fresh.map((d) => ({
           set_id: setIds.get(d.set)!,
           reading_type: d.readingType,
           sequence: d.sequence,
@@ -104,7 +112,7 @@ async function main() {
             >`insert into public.lectionary_readings ${tx(readingRows.slice(i, i + 1000))} returning id`),
           );
         }
-        const rangeRows = decoded.flatMap((d, i) =>
+        const rangeRows = fresh.flatMap((d, i) =>
           (d.ranges ?? []).map((r, seq) => ({
             reading_id: inserted[i].id,
             seq: seq + 1,

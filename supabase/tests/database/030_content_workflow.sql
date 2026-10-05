@@ -33,7 +33,7 @@ select lives_ok(
   $$update public.prayers set status = 'in_review' where slug = 'test-prayer'$$,
   'an editor can submit for review'
 );
-select is((select count(*)::int from public.content_audit_log), 0, 'an editor cannot read the audit log');
+select ok((select count(*)::int from public.content_audit_log) > 0, 'editors can read the change history (Phase 11)');
 select throws_ok(
   $$insert into public.prayer_categories (slug, name_en, name_ta) values ('x', 'x', 'x')$$,
   '42501', null,

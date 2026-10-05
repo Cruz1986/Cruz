@@ -53,6 +53,8 @@ const daySchema = z.object({
   title_en: z.string(),
   title_ta: z.string(),
   kind: z.string(),
+  notes_en: z.string().nullable(),
+  notes_ta: z.string().nullable(),
   liturgical_day_celebrations: z.array(
     z.object({
       is_primary: z.boolean(),
@@ -94,6 +96,9 @@ export type Today = {
   titleEn: string;
   titleTa: string;
   kind: string;
+  /** Editors' notes for the day (e.g. a local observance). */
+  notesEn: string | null;
+  notesTa: string | null;
   color: LiturgicalColor;
   season: Season;
   week: number | null;
@@ -107,7 +112,7 @@ export type Today = {
 };
 
 const DAY_SELECT = `
-  date, season, week_number, sunday_cycle, weekday_cycle, color, day_code, title_en, title_ta, kind,
+  date, season, week_number, sunday_cycle, weekday_cycle, color, day_code, title_en, title_ta, kind, notes_en, notes_ta,
   liturgical_calendars!inner(code),
   liturgical_day_celebrations(is_primary, sort_order, celebrations(code, name_en, name_ta, rank, color, saints(slug))),
   liturgical_day_masses(mass_key, role, sort_order, celebrations(code),
@@ -178,6 +183,8 @@ export async function getLiturgicalDay(db: DbClient, calendar: CalendarCode, iso
     titleEn: day.title_en,
     titleTa: day.title_ta,
     kind: day.kind,
+    notesEn: day.notes_en,
+    notesTa: day.notes_ta,
     color: day.color as LiturgicalColor,
     season: day.season as Season,
     week: day.week_number,

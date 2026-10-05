@@ -1,5 +1,5 @@
-import crypto from "node:crypto";
 import { expect, test, type BrowserContext, type Page } from "@playwright/test";
+import { signInAs } from "./support/session";
 
 const withData = Boolean(process.env.E2E_DATA);
 
@@ -84,29 +84,12 @@ test.describe("personal library on this device", () => {
 });
 
 /*
- * Account sync needs a signed-in session. Against a local PostgREST, set E2E_JWT_SECRET (its JWT secret)
- * and E2E_USER_ID (a row in auth.users); the test signs a session cookie as @supabase/ssr stores it.
+ * Account sync needs a signed-in session. Against a local stack, set E2E_JWT_SECRET (its JWT secret)
+ * and E2E_USER_ID (a row in auth.users).
  */
 const secret = process.env.E2E_JWT_SECRET;
 const userId = process.env.E2E_USER_ID;
-
-async function signIn(context: BrowserContext, baseURL: string) {
-  const b64 = (o: object) => Buffer.from(JSON.stringify(o)).toString("base64url");
-  const now = Math.floor(Date.now() / 1000);
-  const head = b64({ alg: "HS256", typ: "JWT" });
-  const body = b64({ sub: userId, role: "authenticated", aud: "authenticated", exp: now + 3600, iat: now });
-  const sig = crypto.createHmac("sha256", secret!).update(`${head}.${body}`).digest("base64url");
-  const session = {
-    access_token: `${head}.${body}.${sig}`,
-    token_type: "bearer",
-    expires_in: 3600,
-    expires_at: now + 3600,
-    refresh_token: "e2e",
-    user: { id: userId, aud: "authenticated", role: "authenticated" },
-  };
-  const host = new URL(process.env.NEXT_PUBLIC_SUPABASE_URL!).hostname.split(".")[0];
-  await context.addCookies([{ name: `sb-${host}-auth-token`, value: `base64-${b64(session)}`, url: baseURL }]);
-}
+const signIn = (context: BrowserContext, baseURL: string) => signInAs(context, baseURL, userId!);
 
 test.describe("personal library in the account", () => {
   test.skip(!withData || !secret || !userId, "set E2E_JWT_SECRET and E2E_USER_ID to test account sync");

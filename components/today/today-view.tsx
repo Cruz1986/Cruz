@@ -1,7 +1,8 @@
 import { getLocale, getTranslations } from "next-intl/server";
 import { CalendarDays } from "lucide-react";
 import type { TodayWithText } from "@/lib/content/today";
-import { allBooks } from "@/lib/content/public-bible";
+import { allBooks, publicBible } from "@/lib/content/public-bible";
+import { publicReflections } from "@/lib/content/reflections";
 import { visibleSlots } from "@/lib/liturgy/readings";
 import { EmptyState } from "@/components/ui/empty-state";
 import { DayHeader } from "./day-header";
@@ -20,7 +21,10 @@ function commonsLabel(code: string, t: Awaited<ReturnType<typeof getTranslations
 export async function TodayView({ day }: { day: TodayWithText }) {
   const t = await getTranslations("today");
   const locale = await getLocale();
-  const books = await allBooks();
+  const [books, reflections] = await Promise.all([allBooks(), publicReflections(day.date)]);
+  // The reader's language first; the other language when that is all there is.
+  const reflection = reflections.find((r) => r.language === locale) ?? reflections[0] ?? null;
+  const reflectionSource = reflection ? await publicBible.attribution(reflection.sourceId) : null;
   const card = (slot: Parameters<typeof ReadingCard>[0]["slot"], key: string) => (
     <ReadingCard
       key={key}
@@ -67,6 +71,24 @@ export async function TodayView({ day }: { day: TodayWithText }) {
           </details>
         );
       })}
+
+      {reflection ? (
+        <section aria-labelledby="reflection" className="border-gold/40 bg-surface space-y-3 rounded-2xl border p-5">
+          <p className="text-gold text-sm font-semibold">{t("reflection")}</p>
+          <h2 id="reflection" lang={reflection.language} className="text-xl font-bold">
+            {reflection.title}
+          </h2>
+          {reflection.body.split(/\n{2,}/).map((paragraph, i) => (
+            <p key={i} lang={reflection.language} className="reading text-fg max-w-none whitespace-pre-line">
+              {paragraph}
+            </p>
+          ))}
+          <p className="text-fg-muted text-sm">
+            {reflection.author}
+            {reflectionSource ? ` · ${reflectionSource}` : null}
+          </p>
+        </section>
+      ) : null}
 
       {day.translation ? (
         <p className="text-fg-muted text-sm">{t("textFrom", { name: day.translation.name })}</p>

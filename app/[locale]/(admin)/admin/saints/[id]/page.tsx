@@ -11,6 +11,7 @@ import { getSaintBy } from "@/lib/content/saints";
 import { contentFormOptions } from "@/lib/admin/prayer-admin-data";
 import { deleteSaint } from "@/lib/admin/saint-actions";
 import { monthNames, saintName } from "@/lib/saints/helpers";
+import { listMedia } from "@/lib/admin/media-data";
 import { PageHeader } from "@/components/ui/page-header";
 import { Button, buttonClasses } from "@/components/ui/button";
 import { SaintForm } from "@/components/admin/saint-form";
@@ -32,7 +33,11 @@ export default async function EditSaintPage({ params }: Props) {
   const db = await createSupabaseServerClient();
   if (!db) notFound();
   const t = await getTranslations();
-  const [options, saint] = await Promise.all([contentFormOptions(db, user), getSaintBy(db, "id", id)]);
+  const [options, saint, media] = await Promise.all([
+    contentFormOptions(db, user),
+    getSaintBy(db, "id", id),
+    listMedia(db),
+  ]);
   if (!saint) notFound();
 
   // Statuses the user may choose, plus the current one so the form shows it truthfully.
@@ -80,7 +85,12 @@ export default async function EditSaintPage({ params }: Props) {
           patronageTa: saint.patronageTa ?? "",
           biographyEn: saint.biographyEn ?? "",
           biographyTa: saint.biographyTa ?? "",
+          imageMediaId: saint.imageMediaId ?? "",
         }}
+        images={media.map((m) => ({
+          value: m.id,
+          label: (locale === "ta" ? (m.alt_ta ?? m.alt_en) : (m.alt_en ?? m.alt_ta)) ?? m.id,
+        }))}
         sources={options.sources}
         statuses={statuses}
         monthNames={monthNames(locale)}

@@ -50,4 +50,8 @@ pnpm db:test      # database migrations + pgTAP tests (needs local PostgreSQL + 
   translation), private notes on verses, prayers and saints, favourites, recently opened history and data
   download. Works on the device without an account and syncs to the reader's account when signed in
   (owner-only database access, merge on sign-in, cleared from the device on sign-out).
-- Next: Phase 11 (admin CMS).
+- Phase 11 (admin CMS): done. Dashboard with review queue and recent changes; editors for calendar days,
+  celebrations and reading references (kept on re-import), daily reflections (shown on Today), Rosary mysteries,
+  Bible translations and book names, media uploads with alt text and credit (saint images), sources and
+  licences, and a change history with field-by-field differences.
+- Next: Phase 12 (search).

@@ -107,6 +107,16 @@ chapter × 1 000 + verse`) in the reference versification, which is the Tamil co
 - `history`: chapters, prayers and saints opened; a trigger keeps the latest 200 per user.
 - Owner-only RLS on every table; the browser writes them directly with the reader's own session.
 
+## Admin support
+
+- `celebrations.names_locked`, `lectionary_readings.is_edited`: set by the admin; the calendar generator and the
+  lectionary importer keep those rows as edited.
+- `admin_set_reading_reference()`: replaces a reading's reference and verse ranges in one transaction
+  (content admins only).
+- `reflections`: at most one published reflection per date and language.
+- `content_audit_log` is readable by all staff; `staff_names()` gives staff display names for "changed by".
+- Storage bucket `media` (created only where Supabase Storage exists): staff upload, content admins delete.
+
 ## Content-table checklist
 
 A new publishable table needs `id`, `source_id`, `status`, `published_at`, `created_by`, `updated_by`,

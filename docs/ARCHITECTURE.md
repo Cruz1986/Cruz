@@ -202,6 +202,40 @@ lib/admin/*         admin server actions: check the role first, then run as the 
 
    After that, manage roles in the app under Admin → Users & roles.
 
+6. The migrations create a public Storage bucket `media` (images up to 15 MB) with upload rights for staff.
+
+## Admin (content management)
+
+| Area            | What staff do                                                                     | Who                       |
+| --------------- | --------------------------------------------------------------------------------- | ------------------------- |
+| Dashboard       | Items waiting for review, content by status, recent changes                       | Staff                     |
+| Bible           | Translation details and status, book names and abbreviations, staff preview       | Staff; book names: admins |
+| Calendar        | A day's title, colour and notes; celebration names and saints; reading references | Content admins            |
+| Reflections     | Daily reflection per date and language, shown on the Today page                   | Staff                     |
+| Prayers, Saints | Texts, biographies, images, workflow                                              | Staff                     |
+| Rosary          | Mystery titles, Scripture, fruits, meditations                                    | Staff                     |
+| Media           | Upload images (alt text, credit, source), attach to saints                        | Staff; delete: admins     |
+| Sources         | Licence and permission of every source; only verified sources can be published    | Content admins            |
+| History         | Every change, who made it, and the fields that changed                            | Staff                     |
+| Users & roles   | Grant and revoke staff roles                                                      | Super admins              |
+
+- Editors save drafts and send items for review; content admins publish, archive and delete. The database
+  enforces the same rules (row level security and the publish guard), so the admin cannot bypass them.
+- Forms are built from `components/admin/form-kit.tsx` and save through `adminSave` (`lib/admin/save.ts`): check
+  the role, validate with zod, check the chosen status, write as the signed-in user, map database errors, refresh
+  the public pages that show the item.
+- Edits survive re-imports: celebration names edited in the admin are kept by `calendar:generate`
+  (`names_locked`), corrected readings by `import:lectionary` (`is_edited`), and days marked "keep" are not
+  regenerated (`is_override`).
+- Images are uploaded from the browser straight to Storage (staff only, by storage policy), then recorded; if
+  recording fails the file is removed. Public pages only show images that are published and from a verified source.
+
+### Testing with a signed-in user
+
+Browser tests for the admin and account sync sign a session cookie with the stack's JWT secret. Set
+`E2E_JWT_SECRET`, `E2E_STAFF_ID` (a content admin in `auth.users`) and `E2E_USER_ID` (a reader); the auth
+endpoint (`/auth/v1/user`) must accept that token, as a local PostgREST stack with a small auth stub does.
+
 ## Commands
 
 | Command      | Purpose                                      |

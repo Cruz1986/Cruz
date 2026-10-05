@@ -12,8 +12,14 @@ export async function AdminHeader({ roles }: { roles: readonly RoleKey[] }) {
   const items = [
     { href: "/admin", label: t("admin.dashboard") },
     { href: "/admin/bible", label: t("admin.bible") },
+    { href: "/admin/calendar", label: t("admin.nav.calendar") },
+    { href: "/admin/reflections", label: t("admin.nav.reflections") },
     { href: "/admin/prayers", label: t("adminPrayers.prayers") },
+    { href: "/admin/rosary", label: t("admin.nav.rosary") },
     { href: "/admin/saints", label: t("adminSaints.saints") },
+    { href: "/admin/media", label: t("admin.nav.media") },
+    { href: "/admin/sources", label: t("admin.nav.sources") },
+    { href: "/admin/audit", label: t("admin.nav.audit") },
     ...(canManageUsers(roles) ? [{ href: "/admin/users", label: t("admin.users") }] : []),
   ];
 

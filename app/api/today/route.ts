@@ -1,5 +1,6 @@
 import type { NextRequest } from "next/server";
 import { DEFAULT_CALENDAR, publicToday } from "@/lib/content/today";
+import { publicReflections } from "@/lib/content/reflections";
 import { CALENDARS, type CalendarCode } from "@/lib/liturgy";
 import { parseIsoDate, todayIn, toIso } from "@/lib/liturgy/plain-date";
 import { DEFAULT_TIME_ZONE } from "@/lib/i18n/request";
@@ -16,6 +17,7 @@ export async function GET(request: NextRequest) {
 
   const day = await publicToday(calendar, date, lang);
   if (!day) return apiError(404, "day_not_found", "No liturgical data for this date.");
+  const reflections = await publicReflections(date);
   return json(
     {
       date: day.date,
@@ -32,6 +34,7 @@ export async function GET(request: NextRequest) {
         kind: c.kind,
         primary: c.isPrimary,
       })),
+      reflections: reflections.map((r) => ({ language: r.language, title: r.title, body: r.body, author: r.author })),
       masses: day.masses.map((m) => ({
         key: m.key,
         readings: m.slots.map((s) => ({

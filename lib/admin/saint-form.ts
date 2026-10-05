@@ -33,6 +33,10 @@ export const saintFormSchema = z
     patronageTa: optionalText(300),
     biographyEn: optionalText(20_000),
     biographyTa: optionalText(20_000),
+    imageMediaId: z
+      .string()
+      .transform((v) => (v === "" ? null : v))
+      .pipe(z.uuid().nullable()),
   })
   .refine((s) => (s.feastMonth === null) === (s.feastDay === null), { message: "feast_incomplete", path: ["feastDay"] })
   .refine(
@@ -69,6 +73,7 @@ const FIELDS = [
   "patronageTa",
   "biographyEn",
   "biographyTa",
+  "imageMediaId",
 ] as const;
 
 export function parseSaintForm(formData: FormData) {
@@ -100,5 +105,6 @@ export function saintRow(s: SaintFormValues) {
     patronage_ta: s.patronageTa,
     biography_en: s.biographyEn,
     biography_ta: s.biographyTa,
+    image_media_id: s.imageMediaId,
   };
 }

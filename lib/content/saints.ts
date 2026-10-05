@@ -19,6 +19,7 @@ export type Saint = SaintListItem & {
   sourceId: string;
   updatedAt: string;
   image: SaintImage | null;
+  imageMediaId: string | null;
   prayers: { slug: string; titleEn: string | null; titleTa: string | null }[];
 };
 
@@ -43,6 +44,7 @@ const saintSchema = summarySchema.extend({
   biography_ta: z.string().nullable(),
   source_id: z.string(),
   updated_at: z.string(),
+  image_media_id: z.string().nullable(),
   media: z
     .object({
       storage_path: z.string(),
@@ -63,7 +65,7 @@ const saintSchema = summarySchema.extend({
 
 const SUMMARY_COLUMNS =
   "id, slug, name_en, name_ta, title_en, title_ta, feast_month, feast_day, patronage_en, patronage_ta, status";
-const SAINT_COLUMNS = `${SUMMARY_COLUMNS}, birth_year, death_year, biography_en, biography_ta, source_id, updated_at,
+const SAINT_COLUMNS = `${SUMMARY_COLUMNS}, birth_year, death_year, biography_en, biography_ta, source_id, updated_at, image_media_id,
   media(storage_path, alt_en, alt_ta, attribution_text),
   saint_prayers(sort_order, prayers(slug, title_en, title_ta))`;
 
@@ -117,6 +119,7 @@ export async function getSaintBy(db: DbClient, field: "slug" | "id", value: stri
     biographyTa: row.biography_ta,
     sourceId: row.source_id,
     updatedAt: row.updated_at,
+    imageMediaId: row.image_media_id,
     image:
       row.media && url
         ? { url, altEn: row.media.alt_en, altTa: row.media.alt_ta, attribution: row.media.attribution_text }

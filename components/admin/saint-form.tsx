@@ -24,6 +24,7 @@ export type SaintFormInitial = {
   patronageTa: string;
   biographyEn: string;
   biographyTa: string;
+  imageMediaId: string;
 };
 
 type Option = { value: string; label: string };
@@ -37,11 +38,13 @@ export function SaintForm({
   sources,
   statuses,
   monthNames,
+  images = [],
 }: {
   initial: SaintFormInitial;
   sources: Option[];
   statuses: { value: ContentStatus; label: string }[];
   monthNames: string[];
+  images?: Option[];
 }) {
   const t = useTranslations("adminSaints");
   const tp = useTranslations("adminPrayers");
@@ -172,6 +175,22 @@ export function SaintForm({
         </fieldset>
         {text("birthYear", t("form.born"), { type: "number" })}
         {text("deathYear", t("form.died"), { type: "number" })}
+        <label className="block text-sm font-medium">
+          {t("form.image")}
+          <select
+            name="imageMediaId"
+            value={values.imageMediaId}
+            onChange={set("imageMediaId")}
+            className={cn(inputClass, "mt-1")}
+          >
+            <option value="">{t("form.noImage")}</option>
+            {images.map((i) => (
+              <option key={i.value} value={i.value}>
+                {i.label}
+              </option>
+            ))}
+          </select>
+        </label>
         <label className="block text-sm font-medium">
           {tp("form.source")}
           <select name="sourceId" value={values.sourceId} onChange={set("sourceId")} className={cn(inputClass, "mt-1")}>

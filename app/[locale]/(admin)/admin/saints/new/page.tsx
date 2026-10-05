@@ -7,6 +7,7 @@ import { STAFF_ROLES } from "@/lib/auth/roles";
 import { createSupabaseServerClient } from "@/lib/db/server";
 import { contentFormOptions } from "@/lib/admin/prayer-admin-data";
 import { monthNames } from "@/lib/saints/helpers";
+import { listMedia } from "@/lib/admin/media-data";
 import { PageHeader } from "@/components/ui/page-header";
 import { SaintForm } from "@/components/admin/saint-form";
 
@@ -21,7 +22,11 @@ export default async function NewSaintPage({ params }: LocaleParams) {
   const db = await createSupabaseServerClient();
   if (!db) notFound();
   const t = await getTranslations("adminSaints");
-  const options = await contentFormOptions(db, user);
+  const [options, media] = await Promise.all([contentFormOptions(db, user), listMedia(db)]);
+  const images = media.map((m) => ({
+    value: m.id,
+    label: (locale === "ta" ? (m.alt_ta ?? m.alt_en) : (m.alt_en ?? m.alt_ta)) ?? m.id,
+  }));
   return (
     <>
       <PageHeader title={t("newSaint")} />
@@ -42,7 +47,9 @@ export default async function NewSaintPage({ params }: LocaleParams) {
           patronageTa: "",
           biographyEn: "",
           biographyTa: "",
+          imageMediaId: "",
         }}
+        images={images}
         sources={options.sources}
         statuses={options.statuses}
         monthNames={monthNames(locale)}

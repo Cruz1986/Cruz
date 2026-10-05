@@ -68,10 +68,11 @@ The Today page needs two steps after the Bible import:
 # 1. Reading lists (references only, no reading texts) from jayarathina/Tamil-Catholic-Lectionary
 pnpm import:lectionary --path /path/to/Tamil-Catholic-Lectionary/MySQL/liturgy_lectionary_table_readings__list.sql
 
-# 2. Generate liturgical days (re-run yearly; days marked is_override are kept)
+# 2. Generate liturgical days (re-run yearly; days marked "keep" in the admin and edited celebration names are kept)
 pnpm calendar:generate --calendar in --from 2025 --to 2030
 ```
 
+- Readings corrected in the admin are kept when the lectionary is imported again.
 - The lectionary import upserts one set per day ID ("OW05-0Sun A", "Saint Agnes, virgin and martyr", "_Martyr", …),
   replaces its readings and parses each reference ("எசா58:7-10") into verse ranges in the reference numbering.
   About 7% of rows are not references (pointers, Commons, sequence names) and are kept as display text.
