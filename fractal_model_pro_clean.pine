@@ -1,0 +1,1452 @@
+//@version=6
+indicator("Fractal Model [Pro+ Clean]", overlay = true, max_lines_count = 500, max_boxes_count = 500, max_labels_count = 500, max_bars_back = 5000)
+
+// ══════════════════════════════════════════════════════════════════════════════
+// Fractal Model [Pro+ Clean]
+//  Pro+ architecture (pattern-first T-Spots on the primary fractal HTF) with:
+//   - 3 HTF panes (horizontal or stacked), single-HTF mode, pane FVG / VI, pane sweeps, EQ lines,
+//     HTF start lines, TF label + countdown, C1..C4 tags
+//   - T-Spot: C3 (sweep), C4 (expansive), mid-level; Silver T-Spot; hide / delete against;
+//     C2 / C3 / C4 labels with state colours (gray / orange consolidating / red failed)
+//   - CISD (chain based), IC-CISD, protected-swing dot, projections, touch confirmation line,
+//     formation liquidity (until taken)
+//   - SMT on the SAME fractal HTF (+ optional pivot SMT) with the Pro+ auto pairs
+//   - BSL / SSL rework (swing pivots + EQH/EQL, previous fractal-candle H/L, PDH/PDL, PWH/PWL;
+//     nearest N only, deleted when swept)
+//   - FVG rework (chart + HTF gaps, partial fills cut the box, a close through DELETES it - no iFVG)
+//   - Everything transient is drawn from a bin on the last bar: clean chart
+// ══════════════════════════════════════════════════════════════════════════════
+
+// ══════════════════════════════════════════════════════════════════════════════
+// 1. INPUTS
+// ══════════════════════════════════════════════════════════════════════════════
+const string G_GEN  = "General"
+const string G_KZ   = "Time Filter (New York)"
+const string G_PANE = "HTF Candles"
+const string G_MOD  = "Model Style"
+const string G_PRJ  = "OrderBlock Projections"
+const string G_LIQ  = "Liquidity (BSL / SSL)"
+const string G_FVG  = "Fair Value Gaps"
+const string G_SMT  = "SMT (TF aligned)"
+const string G_TBL  = "Fractal Model Info Table"
+
+ui_alerts  = input.bool(true, "Alerts", group = G_GEN)
+ui_history = input.int(2, "History", minval = 0, maxval = 40, group = G_GEN, tooltip = "Number of Fractal Model setups (T-Spot / C2 / C3 / C4 / CISD / Projections) kept on the chart. 0 = current setup only.")
+ui_bars    = input.int(2000, "Calculated Bars", minval = 300, maxval = 5000, group = G_GEN)
+ui_fractal = input.string("Automatic", "Fractal", options = ["Automatic", "Custom"], inline = "fr", group = G_GEN)
+ui_c2      = input.bool(true, "C2", inline = "cc", group = G_GEN)
+ui_c3      = input.bool(true, "C3", inline = "cc", group = G_GEN)
+ui_c4      = input.bool(true, "C4", inline = "cc", group = G_GEN)
+ui_ctf1    = input.timeframe("60", "Custom TF 1 (primary)", group = G_GEN)
+ui_ctf2    = input.timeframe("240", "Custom TF 2", group = G_GEN)
+ui_ctf3    = input.timeframe("D", "Custom TF 3", group = G_GEN)
+ui_bias    = input.string("Neutral", "Bias", options = ["Neutral", "Bullish", "Bearish", "Auto Bias 1", "Auto Bias 2"], group = G_GEN)
+
+ui_apply   = input.string("1 hour", "Apply below", options = ["1 hour", "4 hours", "Daily"], group = G_KZ, tooltip = "The time filters below only apply while the chart timeframe is below this value.")
+ui_f1 = input.bool(false, "Filter 1", inline = "f1", group = G_KZ)
+ui_s1 = input.session("0200-0500", "", inline = "f1", group = G_KZ)
+ui_f2 = input.bool(false, "Filter 2", inline = "f2", group = G_KZ)
+ui_s2 = input.session("0800-1100", "", inline = "f2", group = G_KZ)
+ui_f3 = input.bool(false, "Filter 3", inline = "f3", group = G_KZ)
+ui_s3 = input.session("1330-1615", "", inline = "f3", group = G_KZ)
+
+ui_htf_size = input.string("Small", "Size", options = ["Small", "Normal", "Large"], inline = "sz", group = G_PANE)
+ui_htf_hide = input.bool(false, "Hide?", inline = "sz", group = G_PANE)
+ui_offset   = input.int(16, "Offset", minval = 2, group = G_PANE)
+ui_ext      = input.float(5.0, "HTF line extension", minval = 0.5, step = 0.5, group = G_PANE)
+ui_bu_bdy   = input.color(#70a880, "Body", inline = "b", group = G_PANE)
+ui_be_bdy   = input.color(#000000, "", inline = "b", group = G_PANE)
+ui_bu_brd   = input.color(#5d606b, "Border", inline = "r", group = G_PANE)
+ui_be_brd   = input.color(#000000, "", inline = "r", group = G_PANE)
+ui_bu_wk    = input.color(#5d606b, "Wick", inline = "w", group = G_PANE)
+ui_be_wk    = input.color(#5d606b, "", inline = "w", group = G_PANE)
+ui_layout   = input.string("Horizontal Next-to-Each-Other", "Layout", options = ["Horizontal Next-to-Each-Other", "Vertical Stacked (Same Offset)"], group = G_PANE)
+ui_vgap     = input.float(1.2, "Vertical stacked gap multiplier", minval = 0.1, step = 0.1, group = G_PANE)
+ui_n1       = input.int(6, "Primary HTF candle count", minval = 4, maxval = 25, group = G_PANE)
+ui_n2       = input.int(4, "Second HTF candle count (0 = off)", minval = 0, maxval = 25, group = G_PANE)
+ui_n3       = input.int(0, "Third HTF candle count (0 = off)", minval = 0, maxval = 25, group = G_PANE)
+ui_single   = input.bool(false, "Single HTF mode (isolate)", group = G_PANE, tooltip = "Only the timeframe below is shown / used.")
+ui_single_tf = input.string("4 hours", "Single HTF timeframe", options = ["15 minutes", "30 minutes", "45 minutes", "1 hour", "2 hours", "3 hours", "4 hours", "6 hours", "7 hours", "9 hours", "1 day", "1 week", "1 month"], group = G_PANE)
+ui_single_n = input.int(6, "Single HTF candle count", minval = 4, maxval = 25, group = G_PANE)
+ui_htf_lines = input.bool(true, "HTF start lines on chart", group = G_PANE)
+ui_tags     = input.bool(true, "Tag C1 / C2 / C3 / C4 on the pane", group = G_PANE)
+ui_timer    = input.bool(true, "TF label + countdown", group = G_PANE)
+ui_imb      = input.bool(true, "FVG / VI inside the pane", inline = "im", group = G_PANE)
+ui_imb_fvg  = input.color(color.new(color.gray, 80), "", inline = "im", group = G_PANE)
+ui_imb_vi   = input.color(color.new(color.orange, 60), "", inline = "im", group = G_PANE)
+ui_pane_mid = input.bool(true, "EQ lines between pane candles (primary)", group = G_PANE)
+
+ui_show_ttfm = input.bool(true, "Show TTFM labels", inline = "tt", group = G_MOD)
+ui_ttfm_sz   = input.string("Small", "", options = ["Tiny", "Small", "Normal", "Large", "Huge"], inline = "tt", group = G_MOD)
+ui_sw_on     = input.bool(true, "Candle 1 sweep", inline = "sw", group = G_MOD)
+ui_sw_col    = input.color(color.black, "", inline = "sw", group = G_MOD)
+ui_sw_sty    = input.string("Solid", "", options = ["Solid", "Dashed", "Dotted"], inline = "sw", group = G_MOD)
+ui_sw_wid    = input.int(1, "W", minval = 1, maxval = 4, inline = "sw", group = G_MOD)
+ui_bu_en     = input.bool(true, "Bullish CISD", inline = "bu", group = G_MOD)
+ui_bu_col    = input.color(#3b3eff, "", inline = "bu", group = G_MOD)
+ui_bu_sty    = input.string("Solid", "", options = ["Solid", "Dashed", "Dotted"], inline = "bu", group = G_MOD)
+ui_bu_wid    = input.int(2, "W", minval = 1, maxval = 4, inline = "bu", group = G_MOD)
+ui_be_en     = input.bool(true, "Bearish CISD", inline = "be", group = G_MOD)
+ui_be_col    = input.color(#f33030, "", inline = "be", group = G_MOD)
+ui_be_sty    = input.string("Solid", "", options = ["Solid", "Dashed", "Dotted"], inline = "be", group = G_MOD)
+ui_be_wid    = input.int(2, "W", minval = 1, maxval = 4, inline = "be", group = G_MOD)
+ui_cisd_max  = input.int(2, "CISD max history", minval = 1, group = G_MOD)
+ui_ic_on     = input.bool(true, "IC-CISD", inline = "ic", group = G_MOD, tooltip = "Same-side CISDs printed after the main CISD, until the T-Spot (and C4 after a C3) ends.")
+ui_ic_max    = input.int(2, "max", minval = 1, maxval = 6, inline = "ic", group = G_MOD)
+ui_dot_on    = input.bool(true, "Protected swing dot", inline = "dot", group = G_MOD)
+ui_dot_sz    = input.string("Small", "", options = ["Tiny", "Small", "Normal", "Large", "Huge"], inline = "dot", group = G_MOD)
+ui_eq_sty    = input.string("Dotted", "Equilibrium line", options = ["Solid", "Dashed", "Dotted"], inline = "eq", group = G_MOD)
+ui_eq_wid    = input.int(1, "W", minval = 1, maxval = 3, inline = "eq", group = G_MOD)
+ui_ts_on     = input.bool(true, "T-Spot", inline = "ts", group = G_MOD)
+ui_ts_bu     = input.color(color.new(#00c853, 90), "", inline = "ts", group = G_MOD)
+ui_ts_be     = input.color(color.new(#ff1744, 90), "", inline = "ts", group = G_MOD)
+ui_silver    = input.bool(false, "Silver T-Spot labels", group = G_MOD)
+ui_hide_ag   = input.bool(true, "Hide T-Spots traded against (EQ)", group = G_MOD)
+ui_del_ag    = input.bool(false, "Delete older T-Spots traded against", group = G_MOD)
+ui_conf_on   = input.bool(true, "Touch confirmation line", group = G_MOD, tooltip = "After price touches the latest T-Spot, draw the CISD line when a body pivot is broken.")
+ui_fl_on     = input.bool(true, "Formation liquidity", inline = "fl", group = G_MOD)
+ui_fl_col    = input.color(color.black, "", inline = "fl", group = G_MOD)
+ui_fl_sty    = input.string("Dotted", "", options = ["Solid", "Dashed", "Dotted"], inline = "fl", group = G_MOD)
+ui_fl_max    = input.int(5, "Max active liquidity lines", minval = 1, maxval = 20, group = G_MOD)
+
+ui_proj_on  = input.bool(true, "Projections", inline = "p1", group = G_PRJ)
+ui_proj_lv  = input.string("1, 2, 2.5", "", inline = "p1", group = G_PRJ)
+ui_proj_lb  = input.bool(true, "Labels", inline = "p2", group = G_PRJ)
+ui_proj_lsz = input.string("Small", "", options = ["Tiny", "Small", "Normal", "Large", "Huge"], inline = "p2", group = G_PRJ)
+ui_proj_ln  = input.bool(false, "Lines", inline = "p3", group = G_PRJ)
+ui_proj_col = input.color(color.gray, "", inline = "p3", group = G_PRJ)
+ui_proj_sty = input.string("Solid", "", options = ["Solid", "Dashed", "Dotted"], inline = "p3", group = G_PRJ)
+
+ui_liq_on   = input.bool(true, "Show BSL / SSL", group = G_LIQ)
+ui_liq_len  = input.int(5, "Swing length", minval = 2, maxval = 30, group = G_LIQ)
+ui_liq_n    = input.int(2, "Nearest swings per side", minval = 0, maxval = 6, group = G_LIQ)
+ui_eq_tol   = input.float(0.15, "EQH / EQL tolerance (x ATR)", minval = 0.0, step = 0.05, group = G_LIQ)
+ui_k_prev   = input.bool(true, "Previous fractal-candle High / Low", group = G_LIQ)
+ui_k_d      = input.bool(true, "PDH / PDL", inline = "kd", group = G_LIQ)
+ui_k_w      = input.bool(true, "PWH / PWL", inline = "kd", group = G_LIQ)
+ui_bsl_col  = input.color(color.new(#b23b3b, 0), "BSL", inline = "lc", group = G_LIQ)
+ui_ssl_col  = input.color(color.new(#2e7d5b, 0), "SSL", inline = "lc", group = G_LIQ)
+ui_liq_sty  = input.string("Dotted", "Style", options = ["Solid", "Dashed", "Dotted"], inline = "lc", group = G_LIQ)
+
+ui_fvg_on   = input.bool(true, "Show FVG", group = G_FVG)
+ui_fvg_ch   = input.bool(true, "Chart TF", inline = "ft", group = G_FVG)
+ui_fvg_h1   = input.bool(true, "Primary TF", inline = "ft", group = G_FVG)
+ui_fvg_h2   = input.bool(true, "Secondary TF", inline = "ft", group = G_FVG)
+ui_fvg_min  = input.float(0.35, "Min gap size (x ATR)", minval = 0.0, step = 0.05, group = G_FVG)
+ui_fvg_max  = input.int(8, "Max FVGs", minval = 1, maxval = 30, group = G_FVG)
+ui_fvg_bu   = input.color(#2962ff, "Bull", inline = "fc", group = G_FVG)
+ui_fvg_be   = input.color(#f23645, "Bear", inline = "fc", group = G_FVG)
+
+ui_smt       = input.bool(true, "Enable SMT", inline = "s0", group = G_SMT)
+ui_smt_al    = input.bool(true, "Alerts", inline = "s0", group = G_SMT)
+ui_smt_auto  = input.bool(true, "Auto pair", group = G_SMT)
+ui_smt_man   = input.symbol("", "Manual pair", group = G_SMT)
+ui_smt_inv   = input.bool(false, "Inverse pair", group = G_SMT)
+ui_smt_piv   = input.bool(true, "Also pivot SMT (chart pivots)", group = G_SMT)
+ui_smt_last  = input.bool(true, "Keep only latest SMTs", group = G_SMT)
+ui_smt_lbl   = input.bool(true, "Labels", inline = "s1", group = G_SMT)
+ui_smt_lsz   = input.string("Small", "", options = ["Tiny", "Small", "Normal", "Large"], inline = "s1", group = G_SMT)
+ui_smt_sty   = input.string("Solid", "", options = ["Solid", "Dashed", "Dotted"], inline = "s2", group = G_SMT)
+ui_smt_wid   = input.int(1, "W", minval = 1, maxval = 4, inline = "s2", group = G_SMT)
+ui_smt_col   = input.color(color.rgb(204, 162, 9), "", inline = "s2", group = G_SMT)
+
+ui_tbl_on   = input.bool(true, "Show info", inline = "t1", group = G_TBL)
+ui_tbl_sz   = input.string("Small", "", options = ["Tiny", "Small", "Normal", "Large", "Huge"], inline = "t1", group = G_TBL)
+ui_tbl_brd  = input.bool(true, "Border", inline = "t1", group = G_TBL)
+ui_tbl_v    = input.string("Bottom", "Location", options = ["Top", "Middle", "Bottom"], inline = "t2", group = G_TBL)
+ui_tbl_h    = input.string("Right", "", options = ["Left", "Center", "Right"], inline = "t2", group = G_TBL)
+ui_tbl_ch   = input.bool(true, "Chart TF", inline = "t3", group = G_TBL)
+ui_tbl_as   = input.bool(true, "Asset", inline = "t3", group = G_TBL)
+ui_tbl_fr   = input.bool(true, "Fractal", inline = "t4", group = G_TBL)
+ui_tbl_tt   = input.bool(true, "Time to close", inline = "t4", group = G_TBL)
+ui_tbl_bs   = input.bool(true, "Bias", inline = "t4", group = G_TBL)
+ui_tbl_tf   = input.bool(false, "Time filter", inline = "t4", group = G_TBL)
+
+// ══════════════════════════════════════════════════════════════════════════════
+// 2. TYPES
+// ══════════════════════════════════════════════════════════════════════════════
+type HCandle
+    float o
+    float h
+    float l
+    float c
+    int   o_idx
+    int   h_idx
+    int   l_idx
+    int   o_time
+
+type Pane
+    string tf
+    int    cnt
+    float  shift
+    bool   show
+    array<HCandle> cs
+
+type ICC
+    float lv
+    int   x
+    int   e
+    float ext
+    int   ext_x
+
+type SmtT
+    float h
+    float l
+    int   h_idx
+    int   l_idx
+    float ph
+    float pl
+    int   ph_idx
+    int   pl_idx
+
+type SmtRec
+    bool   bear
+    int    x1
+    float  y1
+    int    x2
+    float  y2
+    string name
+    int    bar
+
+type Liq
+    float  px
+    bool   is_high
+    int    x
+    string tag
+
+type FLine
+    float px
+    bool  bull
+    int   x
+
+type Fvg
+    float top
+    float btm
+    bool  bull
+    int   lvl
+    box   bx
+
+type Conf
+    float piv_hi
+    float piv_lo
+    int   piv_hi_bar
+    int   piv_lo_bar
+    bool  ts_touched
+    float ts_level
+    int   ts_touch_bar
+    int   ts_model_bar
+    float cf_px
+    int   cf_x1
+    int   cf_x2
+    int   cf_dir
+
+type Model
+    int    dir                 // 1 bullish, -1 bearish
+    string kind                // "C3", "C4", "MID"
+    int    created_bar
+    int    form_bars
+    int    start_idx
+    int    left_t
+    int    right_t
+    int    ic_until
+    float  eq
+    float  zone_close
+    float  c2_px
+    int    c2_x
+    int    c2o                 // o_idx of the C2 candle (pane tags)
+    bool   failed
+    bool   was_against
+    string silver
+    // C1 sweep
+    bool   has_sweep
+    int    sw_x1
+    int    sw_x2
+    float  sw_px
+    // CISD chain
+    bool   has_chain
+    float  ser_hi
+    float  ser_lo
+    int    ser_left
+    float  ext_px
+    int    ext_x
+    bool   cisd_done
+    int    cisd_bar
+    // IC-CISD
+    array<ICC> ic
+    bool   ic_pending
+    float  ic_level
+    int    ic_x
+    float  ic_ext
+    int    ic_ext_x
+    bool   ic_same
+    float  ic_last
+
+// ══════════════════════════════════════════════════════════════════════════════
+// 3. HELPERS
+// ══════════════════════════════════════════════════════════════════════════════
+getSMTPair() =>
+    string t = syminfo.ticker
+    string r = "CME_MINI:ES1!"
+    if str.contains(t, "MNQ1!")
+        r := "CME_MINI:MES1!"
+    else if str.contains(t, "MES1!")
+        r := "CME_MINI:MNQ1!"
+    else if str.contains(t, "MYM1!")
+        r := "CME_MINI:MNQ1!"
+    else if str.contains(t, "NQ1!") or str.contains(t, "NDX") or str.contains(t, "QQQ") or t == "NQ"
+        r := "CME_MINI:ES1!"
+    else if str.contains(t, "ES1!") or str.contains(t, "SPX") or str.contains(t, "SPY") or t == "ES"
+        r := "CME_MINI:NQ1!"
+    else if str.contains(t, "YM1!")
+        r := "CME_MINI:NQ1!"
+    else if str.contains(t, "RTY1!")
+        r := "CBOT:YM1!"
+    else if str.contains(t, "NAS100")
+        r := "SPX500"
+    else if str.contains(t, "SPX500")
+        r := "NAS100"
+    else if str.contains(t, "US30")
+        r := "NAS100"
+    else if str.contains(t, "EURUSD")
+        r := "GBPUSD"
+    else if str.contains(t, "GBPUSD")
+        r := "EURUSD"
+    else if str.contains(t, "EURCHF")
+        r := "GBPCHF"
+    else if str.contains(t, "GBPCHF")
+        r := "EURCHF"
+    else if str.contains(t, "EURCAD")
+        r := "GBPCAD"
+    else if str.contains(t, "GBPCAD")
+        r := "EURCAD"
+    else if str.contains(t, "AUDUSD")
+        r := "NZDUSD"
+    else if str.contains(t, "NZDUSD")
+        r := "AUDUSD"
+    else if str.contains(t, "EURAUD")
+        r := "GBPAUD"
+    else if str.contains(t, "GBPAUD")
+        r := "EURAUD"
+    else if str.contains(t, "AUDCAD")
+        r := "NZDCAD"
+    else if str.contains(t, "NZDCAD")
+        r := "AUDCAD"
+    else if str.contains(t, "EURJPY")
+        r := "GBPJPY"
+    else if str.contains(t, "GBPJPY")
+        r := "EURJPY"
+    else if str.contains(t, "AUDJPY")
+        r := "NZDJPY"
+    else if str.contains(t, "NZDJPY")
+        r := "AUDJPY"
+    else if str.contains(t, "EURNZD")
+        r := "GBPNZD"
+    else if str.contains(t, "GBPNZD")
+        r := "EURNZD"
+    else if str.contains(t, "AUDCHF")
+        r := "NZDCHF"
+    else if str.contains(t, "NZDCHF")
+        r := "AUDCHF"
+    else if str.contains(t, "CADJPY")
+        r := "CHFJPY"
+    else if str.contains(t, "CHFJPY")
+        r := "CADJPY"
+    else if str.contains(t, "USDJPY")
+        r := "EURJPY"
+    else if str.contains(t, "USDCAD")
+        r := "EURCAD"
+    else if str.contains(t, "USDCHF")
+        r := "EURCHF"
+    else if str.contains(t, "6E1!") or t == "6E"
+        r := "CME:6B1!"
+    else if str.contains(t, "6B1!") or t == "6B"
+        r := "CME:6E1!"
+    else if str.contains(t, "6N1!") or t == "6N"
+        r := "CME:6A1!"
+    else if str.contains(t, "6A1!") or t == "6A"
+        r := "CME:6N1!"
+    else if str.contains(t, "XAUUSD")
+        r := "XAGUSD"
+    else if str.contains(t, "XAGUSD")
+        r := "XAUUSD"
+    else if str.contains(t, "XAUEUR")
+        r := "XAUUSD"
+    else if str.contains(t, "XAUGBP")
+        r := "COMEX:GC1!"
+    else if str.contains(t, "GC1!")
+        r := "XAGUSD"
+    else if str.contains(t, "XAGEUR")
+        r := "COMEX:SI1!"
+    else if str.contains(t, "XAGGBP")
+        r := "COMEX:SI1!"
+    else if str.contains(t, "SIL1!") or str.contains(t, "SI1!")
+        r := "XAGEUR"
+    else if str.contains(t, "CL1!")
+        r := "NYMEX:RB1!"
+    else if str.contains(t, "RB1!")
+        r := "NYMEX:HO1!"
+    else if str.contains(t, "HO1!")
+        r := "NYMEX:CL1!"
+    else if str.contains(t, "MBT1!")
+        r := "CME:MET1!"
+    else if str.contains(t, "MET1!")
+        r := "CME:MBT1!"
+    else if str.contains(t, "BTCUSDT") or str.contains(t, "BTC")
+        r := "ETHUSDT"
+    else if str.contains(t, "ETHUSDT") or str.contains(t, "ETH")
+        r := "BTCUSDT"
+    r
+
+f_size(string s) =>
+    switch s
+        "Tiny"   => size.tiny
+        "Small"  => size.small
+        "Normal" => size.normal
+        "Large"  => size.large
+        "Huge"   => size.huge
+        => size.small
+
+f_style(string s) =>
+    s == "Dashed" ? line.style_dashed : s == "Dotted" ? line.style_dotted : line.style_solid
+
+f_tfname(string tf) =>
+    float s = timeframe.in_seconds(tf)
+    string r = tf
+    if s < 60
+        r := str.tostring(s) + "S"
+    else if s < 3600
+        r := str.tostring(s / 60) + "M"
+    else if s < 86400
+        r := str.tostring(s / 3600) + "H"
+    else if s < 604800
+        r := str.tostring(s / 86400) + "D"
+    else if s < 2419200
+        r := str.tostring(s / 604800) + "W"
+    else
+        r := str.tostring(s / 2592000) + "M"
+    r
+
+f_rem(int close_t) =>
+    string out = "n/a"
+    if not na(close_t)
+        float secs = math.max((close_t - timenow) / 1000, 0.0)
+        int d  = int(math.floor(secs / 86400))
+        int hh = int(math.floor((secs - d * 86400) / 3600))
+        int mm = int(math.floor((secs - d * 86400 - hh * 3600) / 60))
+        int ss = int(secs - d * 86400 - hh * 3600 - mm * 60)
+        out := d > 0 ? str.format("{0}D {1}H", d, hh) : hh > 0 ? str.format("{0}:{1}:{2}", str.tostring(hh, "00"), str.tostring(mm, "00"), str.tostring(ss, "00")) : str.format("{0}:{1}", str.tostring(mm, "00"), str.tostring(ss, "00"))
+    out
+
+// Wick-weighted equilibrium: mid of the dominant wick when it is longer than the body, else hl2
+f_eq(float h, float l, float o, float c) =>
+    float body = math.abs(c - o)
+    float uw = h - math.max(o, c)
+    float lw = math.min(o, c) - l
+    float m = (h + l) / 2
+    if math.max(uw, lw) > body
+        m := uw > lw ? h - uw / 2 : l + lw / 2
+    m
+
+f_valid(string tf) =>
+    bool ok = false
+    if tf != ""
+        float a = timeframe.in_seconds(tf)
+        float b = timeframe.in_seconds()
+        ok := a > b and (a >= 86400 or math.round(a / b) == a / b)
+    ok
+
+f_in(string s) => not na(time(timeframe.period, s, "America/New_York"))
+
+f_open_txt(int t, float htf_sec) =>
+    string fmt = htf_sec >= 2419200 ? "MMM" : htf_sec >= 604800 ? "d MMM" : htf_sec >= 86400 ? "EEE" : "HH:mm"
+    str.format_time(t, fmt, syminfo.timezone)
+
+f_bias(HCandle a, HCandle b) =>
+    string r = "Neutral"
+    if not na(a) and not na(b)
+        bool sh = a.h > b.h
+        bool sl = a.l < b.l
+        if a.c > b.h
+            r := "Bullish"
+        else if a.c < b.l
+            r := "Bearish"
+        else if sh and a.c < b.h
+            r := "Bearish"
+        else if sl and a.c > b.l
+            r := "Bullish"
+        else if sh and sl
+            float uw = a.h - math.max(a.o, a.c)
+            float lw = math.min(a.o, a.c) - a.l
+            if lw > uw
+                r := "Bearish"
+            else if uw > lw
+                r := "Bullish"
+    r
+
+// ══════════════════════════════════════════════════════════════════════════════
+// 4. TF-ALIGNED STATE
+// ══════════════════════════════════════════════════════════════════════════════
+float chart_sec = timeframe.in_seconds(timeframe.period)
+string a1 = ""
+string a2 = ""
+string a3 = ""
+if chart_sec <= 60
+    a1 := "15"
+    a2 := "30"
+    a3 := "60"
+else if chart_sec <= 180
+    a1 := "30"
+    a2 := "60"
+    a3 := "240"
+else if chart_sec <= 300
+    a1 := "60"
+    a2 := "240"
+    a3 := "D"
+else if chart_sec <= 1800
+    a1 := "240"
+    a2 := "D"
+    a3 := "W"
+else if chart_sec <= 3600
+    a1 := "D"
+    a2 := "W"
+    a3 := "M"
+else if chart_sec <= 14400
+    a1 := "W"
+    a2 := "M"
+    a3 := ""
+else
+    a1 := "M"
+    a2 := ""
+    a3 := ""
+
+string single_tf = switch ui_single_tf
+    "15 minutes" => "15"
+    "30 minutes" => "30"
+    "45 minutes" => "45"
+    "1 hour"     => "60"
+    "2 hours"    => "120"
+    "3 hours"    => "180"
+    "4 hours"    => "240"
+    "6 hours"    => "360"
+    "7 hours"    => "420"
+    "9 hours"    => "540"
+    "1 day"      => "D"
+    "1 week"     => "W"
+    "1 month"    => "M"
+    => "240"
+
+string h1 = ui_fractal == "Automatic" ? a1 : ui_ctf1
+string h2 = ui_fractal == "Automatic" ? a2 : ui_ctf2
+string h3 = ui_fractal == "Automatic" ? a3 : ui_ctf3
+int n1 = ui_n1
+int n2 = ui_n2
+int n3 = ui_n3
+if ui_single
+    h1 := single_tf
+    h2 := ""
+    h3 := ""
+    n1 := ui_single_n
+    n2 := 0
+    n3 := 0
+
+bool v1 = f_valid(h1)
+bool v2 = f_valid(h2) and n2 > 0
+bool v3 = f_valid(h3) and n3 > 0
+string h1u = v1 ? h1 : timeframe.period
+string h2u = v2 ? h2 : timeframe.period
+string h3u = v3 ? h3 : timeframe.period
+
+bool new1 = ta.change(time(h1u)) != 0
+bool new2 = ta.change(time(h2u)) != 0
+bool new3 = ta.change(time(h3u)) != 0
+int tclose1 = time_close(h1u)
+int tclose2 = time_close(h2u)
+int tclose3 = time_close(h3u)
+float htf1_sec = timeframe.in_seconds(h1u)
+int htf1_bars = int(math.max(htf1_sec / chart_sec, 1))
+
+bool run = bar_index > last_bar_index - ui_bars
+float atr14 = ta.atr(14)
+float label_atr = ta.atr(200) / 2
+float chart_range = ta.highest(high, 200) - ta.lowest(low, 200)
+int pw = ui_htf_size == "Small" ? 2 : ui_htf_size == "Normal" ? 3 : 4
+
+float apply_sec = ui_apply == "1 hour" ? 3600 : ui_apply == "4 hours" ? 14400 : 86400
+bool kzAny = ui_f1 or ui_f2 or ui_f3
+bool kzActive = kzAny and chart_sec < apply_sec
+bool kzOK = not kzActive or (ui_f1 and f_in(ui_s1)) or (ui_f2 and f_in(ui_s2)) or (ui_f3 and f_in(ui_s3))
+
+int candleOfDay = int(math.floor(hour(time) / 4)) + 1
+bool silverTime = candleOfDay == 5 or (candleOfDay == 4 and hour(time, "America/New_York") >= 13)
+
+string pair_sym = ui_smt_auto or ui_smt_man == "" ? getSMTPair() : ui_smt_man
+string pair_name = pair_sym
+if str.contains(pair_name, ":")
+    string[] parts = str.split(pair_name, ":")
+    pair_name := array.get(parts, array.size(parts) - 1)
+pair_name := str.replace_all(pair_name, "1!", "")
+[pair_h, pair_l] = request.security(pair_sym, "", [high, low], lookahead = barmerge.lookahead_on, ignore_invalid_symbol = true)
+[pair_h3, pair_l3] = request.security(pair_sym, "", [high[3], low[3]], lookahead = barmerge.lookahead_on, ignore_invalid_symbol = true)
+
+[dH1, dL1, dH0, dL0] = request.security(syminfo.tickerid, "D", [high[1], low[1], high, low], lookahead = barmerge.lookahead_on)
+[wH1, wL1, wH0, wL0] = request.security(syminfo.tickerid, "W", [high[1], low[1], high, low], lookahead = barmerge.lookahead_on)
+
+f_fvgdata() => [high[1], low[1], high[3], low[3], time[2]]
+[g1h1, g1l1, g1h3, g1l3, g1t2] = request.security(syminfo.tickerid, h1u, f_fvgdata(), lookahead = barmerge.lookahead_on)
+[g2h1, g2l1, g2h3, g2l3, g2t2] = request.security(syminfo.tickerid, h2u, f_fvgdata(), lookahead = barmerge.lookahead_on)
+bool g1chg = ta.change(g1t2) != 0
+bool g2chg = ta.change(g2t2) != 0
+
+var Pane p1 = Pane.new("", 0, 0.0, false, array.new<HCandle>())
+var Pane p2 = Pane.new("", 0, 0.0, false, array.new<HCandle>())
+var Pane p3 = Pane.new("", 0, 0.0, false, array.new<HCandle>())
+var array<Model> models = array.new<Model>()
+var array<FLine> flines = array.new<FLine>()
+var array<SmtRec> smts = array.new<SmtRec>()
+var SmtT tc = SmtT.new()
+var SmtT tp = SmtT.new()
+var array<Liq> liqs = array.new<Liq>()
+var array<Fvg> fvgs = array.new<Fvg>()
+
+var array<line>  bl = array.new<line>()
+var array<box>   bb = array.new<box>()
+var array<label> bt = array.new<label>()
+
+// touch confirmation state (latest T-Spot) - kept in an object because functions cannot modify globals
+var Conf cfs = Conf.new()
+
+// pivot SMT state: current / previous chart pivot and the pair value at the same bar
+var float  ph0 = na
+var int    ph0_b = na
+var float  pr_h0 = na
+var float  ph1 = na
+var int    ph1_b = na
+var float  pr_h1 = na
+var float  pl0 = na
+var int    pl0_b = na
+var float  pr_l0 = na
+var float  pl1 = na
+var int    pl1_b = na
+var float  pr_l1 = na
+
+string bias_now = "Neutral"
+bool allowBull = true
+bool allowBear = true
+
+// ══════════════════════════════════════════════════════════════════════════════
+// 5. DRAWING PRIMITIVES (bin)
+// ══════════════════════════════════════════════════════════════════════════════
+f_clear() =>
+    for x in bl
+        line.delete(x)
+    for x in bb
+        box.delete(x)
+    for x in bt
+        label.delete(x)
+    bl.clear()
+    bb.clear()
+    bt.clear()
+
+f_ln(int x1, float y1, int x2, float y2, color c, string st, int w) =>
+    bl.push(line.new(x1, y1, x2, y2, xloc = xloc.bar_index, color = c, style = st, width = w))
+
+f_lnt(int x1, float y1, int x2, float y2, color c, string st, int w) =>
+    bl.push(line.new(x1, y1, x2, y2, xloc = xloc.bar_time, color = c, style = st, width = w))
+
+f_bx(int l, float t, int r, float b, color bc, color bg) =>
+    bb.push(box.new(l, t, r, b, xloc = xloc.bar_index, border_color = bc, border_width = 1, bgcolor = bg))
+
+f_bxn(int l, float t, int r, float b, color bg) =>
+    bb.push(box.new(l, t, r, b, xloc = xloc.bar_index, border_color = color.new(color.white, 100), border_width = 0, bgcolor = bg))
+
+f_bxt(int l, float t, int r, float b, color bg) =>
+    bb.push(box.new(l, t, r, b, xloc = xloc.bar_time, border_color = color.new(color.white, 100), border_width = 0, bgcolor = bg))
+
+f_lb(int x, float y, string t, string st, color c, string sz) =>
+    bt.push(label.new(x, y, t, xloc = xloc.bar_index, yloc = yloc.price, color = color.new(color.white, 100), style = st, textcolor = c, size = sz, text_font_family = font.family_monospace))
+
+// ══════════════════════════════════════════════════════════════════════════════
+// 6. PANE DATA
+// ══════════════════════════════════════════════════════════════════════════════
+f_upd(Pane p, bool is_new, string tf, int cnt, bool on) =>
+    p.tf := tf
+    p.cnt := cnt
+    p.show := on
+    if on
+        if is_new or p.cs.size() == 0
+            p.cs.unshift(HCandle.new(open, high, low, close, bar_index, bar_index, bar_index, time))
+            while p.cs.size() > cnt + 6
+                p.cs.pop()
+        else
+            HCandle c = p.cs.first()
+            c.c := close
+            if high > c.h
+                c.h := high
+                c.h_idx := bar_index
+            if low < c.l
+                c.l := low
+                c.l_idx := bar_index
+    p
+
+f_upd(p1, new1, h1, n1, run and v1)
+f_upd(p2, new2, h2, n2, run and v2)
+f_upd(p3, new3, h3, n3, run and v3)
+
+float shift_amount = chart_range * ui_vgap
+bool stacked = ui_layout == "Vertical Stacked (Same Offset)"
+p1.shift := 0.0
+p2.shift := stacked ? shift_amount : 0.0
+p3.shift := stacked ? shift_amount * 2 : 0.0
+
+bias_now := ui_bias
+if ui_bias == "Auto Bias 1" and p1.cs.size() >= 3
+    bias_now := f_bias(p1.cs.get(1), p1.cs.get(2))
+else if ui_bias == "Auto Bias 2" and p2.cs.size() >= 3
+    bias_now := f_bias(p2.cs.get(1), p2.cs.get(2))
+allowBull := bias_now == "Bullish" or bias_now == "Neutral"
+allowBear := bias_now == "Bearish" or bias_now == "Neutral"
+
+// ══════════════════════════════════════════════════════════════════════════════
+// 7. SMT (TF aligned + optional pivot SMT)
+// ══════════════════════════════════════════════════════════════════════════════
+f_smt_add(bool bear, int x1, float y1, int x2, float y2) =>
+    if ui_smt
+        if ui_smt_last
+            int k = smts.size() - 1
+            while k >= 0
+                if smts.get(k).bear == bear
+                    smts.remove(k)
+                k -= 1
+        smts.push(SmtRec.new(bear, x1, y1, x2, y2, pair_name, bar_index))
+        while smts.size() > 8
+            smts.shift()
+        if ui_smt_al and barstate.isconfirmed
+            alert("SMT " + (bear ? "Bearish" : "Bullish") + " vs " + pair_name + " [" + f_tfname(h1u) + "]", alert.freq_once_per_bar)
+    bear
+
+// First bar of a new primary-HTF candle: the finished candle vs the one before it (same fractal TF)
+f_smt_htf() =>
+    if ui_smt and not na(tc.ph) and not na(tp.ph) and not na(tp.h)
+        bool c_hh = tc.h > tc.ph
+        bool c_ll = tc.l < tc.pl
+        bool p_hh = ui_smt_inv ? tp.l < tp.pl : tp.h > tp.ph
+        bool p_ll = ui_smt_inv ? tp.h > tp.ph : tp.l < tp.pl
+        if c_hh != p_hh
+            f_smt_add(true, tc.ph_idx, tc.ph, tc.h_idx, tc.h)
+        if c_ll != p_ll
+            f_smt_add(false, tc.pl_idx, tc.pl, tc.l_idx, tc.l)
+    0
+
+if run and ui_smt
+    if new1
+        f_smt_htf()
+        tc.ph := tc.h
+        tc.pl := tc.l
+        tc.ph_idx := tc.h_idx
+        tc.pl_idx := tc.l_idx
+        tc.h := high
+        tc.l := low
+        tc.h_idx := bar_index
+        tc.l_idx := bar_index
+        tp.ph := tp.h
+        tp.pl := tp.l
+        tp.h := pair_h
+        tp.l := pair_l
+    else
+        if na(tc.h) or high > tc.h
+            tc.h := high
+            tc.h_idx := bar_index
+        if na(tc.l) or low < tc.l
+            tc.l := low
+            tc.l_idx := bar_index
+        if not na(pair_h)
+            tp.h := na(tp.h) ? pair_h : math.max(tp.h, pair_h)
+        if not na(pair_l)
+            tp.l := na(tp.l) ? pair_l : math.min(tp.l, pair_l)
+
+// Pivot SMT: chart makes a higher high / lower low and the pair fails to follow
+float sp_hi = ta.pivothigh(high, 3, 3)
+float sp_lo = ta.pivotlow(low, 3, 3)
+if run and ui_smt and ui_smt_piv and barstate.isconfirmed
+    if not na(sp_hi)
+        ph1 := ph0
+        ph1_b := ph0_b
+        pr_h1 := pr_h0
+        ph0 := sp_hi
+        ph0_b := bar_index - 3
+        pr_h0 := ui_smt_inv ? pair_l3 : pair_h3
+        if not na(ph1) and not na(pr_h1) and not na(pr_h0) and ph0 > ph1
+            bool failed_hi = ui_smt_inv ? pr_h0 > pr_h1 : pr_h0 < pr_h1
+            if failed_hi
+                f_smt_add(true, ph1_b, ph1, ph0_b, ph0)
+    if not na(sp_lo)
+        pl1 := pl0
+        pl1_b := pl0_b
+        pr_l1 := pr_l0
+        pl0 := sp_lo
+        pl0_b := bar_index - 3
+        pr_l0 := ui_smt_inv ? pair_h3 : pair_l3
+        if not na(pl1) and not na(pr_l1) and not na(pr_l0) and pl0 < pl1
+            bool failed_lo = ui_smt_inv ? pr_l0 < pr_l1 : pr_l0 > pr_l1
+            if failed_lo
+                f_smt_add(false, pl1_b, pl1, pl0_b, pl0)
+
+// ══════════════════════════════════════════════════════════════════════════════
+// 8. MODEL ENGINE (pattern-first T-Spots on the primary fractal HTF)
+// ══════════════════════════════════════════════════════════════════════════════
+f_alert(string what, int dir) =>
+    if ui_alerts and barstate.isconfirmed
+        alert(str.format("{0}-{1} {2}: {3} {4}", f_tfname(timeframe.period), f_tfname(h1u), syminfo.ticker, dir == 1 ? "Bullish" : "Bearish", what), alert.freq_once_per_bar)
+
+// Formation liquidity: unique levels, deleted once taken
+f_fl_add(float px, bool bull, int x) =>
+    if ui_fl_on and not na(px) and not na(x)
+        bool exists = false
+        for f in flines
+            if math.abs(f.px - px) < 1.0e-7
+                exists := true
+                break
+        if not exists
+            flines.unshift(FLine.new(px, bull, x))
+            while flines.size() > ui_fl_max
+                flines.pop()
+    0
+
+// Series of consecutive opposing candles ending at the C2 extreme; CISD = body break of that series
+f_chain(Model m, int c2_bar) =>
+    int off0 = bar_index - c2_bar
+    if off0 >= 0 and off0 < 4900
+        float shi = math.max(open[off0], close[off0])
+        float slo = math.min(open[off0], close[off0])
+        float ext = m.dir == 1 ? low[off0] : high[off0]
+        int extb = c2_bar
+        int cnt = 1
+        for i = 1 to 20
+            int cb = c2_bar - i
+            if cb < 0
+                break
+            int off = bar_index - cb
+            if off >= 4900
+                break
+            bool bullc = close[off] > open[off]
+            bool contin = m.dir == 1 ? not bullc : bullc
+            if not contin
+                break
+            shi := math.max(shi, math.max(open[off], close[off]))
+            slo := math.min(slo, math.min(open[off], close[off]))
+            if m.dir == 1 and low[off] < ext
+                ext := low[off]
+                extb := cb
+            if m.dir == -1 and high[off] > ext
+                ext := high[off]
+                extb := cb
+            cnt += 1
+        m.has_chain := true
+        m.ser_hi := shi
+        m.ser_lo := slo
+        m.ser_left := c2_bar - (cnt - 1)
+        m.ext_px := ext
+        m.ext_x := extb
+        // already broken since the C2 extreme?
+        for k = 0 to off0
+            int cb2 = c2_bar + k
+            float cl = close[bar_index - cb2]
+            if m.dir == 1 ? cl > shi : cl < slo
+                m.cisd_done := true
+                m.cisd_bar := cb2
+                break
+    m
+
+f_make(int dir, string kind, HCandle last, float sm, int c2_bar, float c2_px, int c2o, bool has_sw, float sw_px, int sw_x1, int sw_x2, string silver) =>
+    Model m = Model.new(ic = array.new<ICC>())
+    m.dir := dir
+    m.kind := kind
+    m.created_bar := bar_index
+    m.form_bars := htf1_bars
+    m.start_idx := bar_index
+    m.left_t := time
+    m.right_t := tclose1
+    m.ic_until := kind == "C3" ? tclose1 + (tclose1 - time) : tclose1
+    m.eq := sm
+    m.zone_close := last.c
+    m.c2_px := c2_px
+    m.c2_x := c2_bar
+    m.c2o := c2o
+    m.silver := silver
+    m.has_sweep := has_sw
+    m.sw_px := sw_px
+    m.sw_x1 := sw_x1
+    m.sw_x2 := sw_x2
+    if kind != "MID"
+        f_chain(m, c2_bar)
+    models.unshift(m)
+    while models.size() > math.max(ui_history, 1)
+        models.pop()
+    f_alert(kind + " T-Spot", dir)
+    m
+
+// Evaluate the six Pro+ patterns on the first bar of a new primary-HTF candle
+f_create() =>
+    array<HCandle> cs = p1.cs
+    if cs.size() >= 4 and kzOK
+        HCandle last = cs.get(1)   // the candle that just closed
+        HCandle prev = cs.get(2)
+        HCandle pp   = cs.get(3)
+        bool outside = last.h > prev.h and last.l < prev.l and last.c > prev.l and last.c < prev.h
+        float mid_prev = f_eq(prev.h, prev.l, prev.o, prev.c)
+        float sm = f_eq(last.h, last.l, last.o, last.c)
+        bool both_prev = prev.h > pp.h and prev.l < pp.l and prev.c > pp.l and prev.c < pp.h
+        bool made = false
+
+        // A: bearish C3 (C1 high swept, closed back inside)
+        if not made and ui_c3 and allowBear and last.h > prev.h and last.c < prev.h and not outside and last.c < sm
+            string sv = ui_silver and silverTime and last.c < pp.l and last.c < prev.l ? "Silver T-Spot" : ""
+            f_make(-1, "C3", last, sm, last.h_idx, last.h, last.o_idx, true, prev.h, prev.h_idx, last.h_idx, sv)
+            f_fl_add(prev.l, false, prev.l_idx)
+            made := true
+        // B: bullish C3
+        if not made and ui_c3 and allowBull and last.l < prev.l and last.c > prev.l and not outside and last.c > sm
+            string sv = ui_silver and silverTime and last.c > pp.h and last.c > prev.h ? "Silver T-Spot" : ""
+            f_make(1, "C3", last, sm, last.l_idx, last.l, last.o_idx, true, prev.l, prev.l_idx, last.l_idx, sv)
+            f_fl_add(prev.h, true, prev.h_idx)
+            made := true
+        // C: bearish expansive (C4)
+        if not made and ui_c4 and allowBear and prev.h > pp.h and last.c < math.max(prev.o, prev.c) and not outside and (prev.c >= mid_prev or prev.c >= pp.h or both_prev) and last.c < sm
+            string sv = ui_silver and silverTime and last.c < pp.l and last.c < prev.l ? "Silver Expansive T-Spot" : ""
+            f_make(-1, "C4", last, sm, prev.h_idx, prev.h, prev.o_idx, false, na, na, na, sv)
+            f_fl_add(prev.l, false, prev.l_idx)
+            made := true
+        // D: bullish expansive (C4)
+        if not made and ui_c4 and allowBull and prev.l < pp.l and last.c > math.min(prev.o, prev.c) and not outside and (prev.c <= mid_prev or prev.c <= pp.l or both_prev) and last.c > sm
+            string sv = ui_silver and silverTime and last.c > pp.h and last.c > prev.h ? "Silver Expansive T-Spot" : ""
+            f_make(1, "C4", last, sm, prev.l_idx, prev.l, prev.o_idx, false, na, na, na, sv)
+            f_fl_add(prev.h, true, prev.h_idx)
+            made := true
+        // E: bullish mid-level
+        if not made and ui_c3 and allowBull and last.l < mid_prev and last.l > prev.o and last.c > prev.h and not outside and last.c > sm
+            f_make(1, "MID", last, sm, last.l_idx, last.l, last.o_idx, false, na, na, na, "")
+            made := true
+        // F: bearish mid-level
+        if not made and ui_c3 and allowBear and last.h > mid_prev and last.h < prev.o and last.c < prev.l and not outside and last.c < sm
+            f_make(-1, "MID", last, sm, last.h_idx, last.h, last.o_idx, false, na, na, na, "")
+            made := true
+    0
+
+f_ic(Model m) =>
+    if ui_ic_on and m.cisd_done and not m.failed and time < m.ic_until and bar_index > m.cisd_bar
+        bool opp  = m.dir == 1 ? close < open : close > open
+        bool same = m.dir == 1 ? close > open : close < open
+        if m.ic_pending
+            bool newx = m.dir == 1 ? low < m.ic_ext : high > m.ic_ext
+            if newx
+                m.ic_ext := m.dir == 1 ? low : high
+                m.ic_ext_x := bar_index
+            if same
+                m.ic_same := true
+            else if opp
+                bool takes = m.dir == 1 ? low <= m.ic_ext : high >= m.ic_ext
+                if m.ic_same and takes
+                    m.ic_level := open
+                    m.ic_x := bar_index
+                    m.ic_ext := m.dir == 1 ? low : high
+                    m.ic_ext_x := bar_index
+                    m.ic_same := false
+            if bar_index > m.ic_x
+                bool broke = m.dir == 1 ? close > m.ic_level : close < m.ic_level
+                if broke
+                    m.ic.push(ICC.new(m.ic_level, m.ic_x, bar_index, m.ic_ext, m.ic_ext_x))
+                    if m.ic.size() > ui_ic_max
+                        m.ic.shift()
+                    m.ic_last := m.ic_ext
+                    m.ic_pending := false
+                    m.ic_same := false
+        else if opp
+            float be = m.dir == 1 ? low : high
+            bool better = na(m.ic_last) or (m.dir == 1 ? be < m.ic_last : be > m.ic_last)
+            if better
+                m.ic_pending := true
+                m.ic_level := open
+                m.ic_x := bar_index
+                m.ic_ext := be
+                m.ic_ext_x := bar_index
+                m.ic_same := false
+    m
+
+// Per-bar maintenance of every kept model: failure, against-EQ flag, CISD break, IC-CISD
+f_models_step() =>
+    if models.size() > 0
+        for m in models
+            if m.kind != "MID" and not m.failed
+                bool fail = m.dir == 1 ? close < m.c2_px : close > m.c2_px
+                if fail
+                    m.failed := true
+            if not m.was_against
+                bool ag = m.dir == 1 ? close < m.eq : close > m.eq
+                if ag and bar_index > m.created_bar
+                    m.was_against := true
+            if m.has_chain and not m.cisd_done and not m.failed
+                bool brk = m.dir == 1 ? close > m.ser_hi : close < m.ser_lo
+                if brk and bar_index > m.created_bar
+                    m.cisd_done := true
+                    m.cisd_bar := bar_index
+                    f_alert("CISD", m.dir)
+            f_ic(m)
+        if ui_del_ag
+            int newest_bull = -1
+            int newest_bear = -1
+            for i = 0 to models.size() - 1
+                Model q = models.get(i)
+                if q.dir == 1 and newest_bull < 0
+                    newest_bull := i
+                if q.dir == -1 and newest_bear < 0
+                    newest_bear := i
+            int j = models.size() - 1
+            while j >= 0
+                Model q2 = models.get(j)
+                if q2.was_against and j != newest_bull and j != newest_bear
+                    models.remove(j)
+                j -= 1
+    0
+
+// Touch of the latest T-Spot -> CISD confirmation line on the next body-pivot break
+float bp_hi = ta.pivothigh(math.max(open, close), 2, 2)
+float bp_lo = ta.pivotlow(math.min(open, close), 2, 2)
+
+f_conf() =>
+    if not na(bp_hi)
+        cfs.piv_hi := bp_hi
+        cfs.piv_hi_bar := bar_index - 2
+    if not na(bp_lo)
+        cfs.piv_lo := bp_lo
+        cfs.piv_lo_bar := bar_index - 2
+    if models.size() > 0
+        Model m = models.first()
+        if m.kind != "MID" and not m.failed
+            if na(cfs.ts_model_bar) or cfs.ts_model_bar != m.created_bar
+                cfs.ts_touched := false
+                cfs.ts_model_bar := m.created_bar
+            float lvl = m.dir == 1 ? math.max(m.eq, m.zone_close) : math.min(m.eq, m.zone_close)
+            if m.dir == -1
+                if (high > lvl or open > lvl) and close < lvl
+                    cfs.ts_touched := true
+                    cfs.ts_level := lvl
+                    cfs.ts_touch_bar := bar_index
+            else
+                if (low < lvl or open < lvl) and close > lvl
+                    cfs.ts_touched := true
+                    cfs.ts_level := lvl
+                    cfs.ts_touch_bar := bar_index
+            if cfs.ts_touched and ui_conf_on
+                if m.dir == 1 and not na(cfs.piv_hi) and cfs.piv_hi_bar < cfs.ts_touch_bar and close > cfs.piv_hi and open < cfs.piv_hi and cfs.piv_hi > cfs.ts_level
+                    cfs.cf_px := cfs.piv_hi
+                    cfs.cf_x1 := cfs.piv_hi_bar
+                    cfs.cf_x2 := bar_index
+                    cfs.cf_dir := 1
+                    cfs.ts_touched := false
+                if m.dir == -1 and not na(cfs.piv_lo) and cfs.piv_lo_bar < cfs.ts_touch_bar and close < cfs.piv_lo and open > cfs.piv_lo and cfs.piv_lo < cfs.ts_level
+                    cfs.cf_px := cfs.piv_lo
+                    cfs.cf_x1 := cfs.piv_lo_bar
+                    cfs.cf_x2 := bar_index
+                    cfs.cf_dir := -1
+                    cfs.ts_touched := false
+    0
+
+if run and v1
+    if new1
+        f_create()
+    f_models_step()
+    f_conf()
+
+// formation liquidity: deleted once taken
+if run and barstate.isconfirmed and flines.size() > 0
+    int fk = flines.size() - 1
+    while fk >= 0
+        FLine fl = flines.get(fk)
+        bool taken = fl.bull ? high >= fl.px : low <= fl.px
+        if taken and bar_index > fl.x
+            flines.remove(fk)
+        fk -= 1
+
+// ══════════════════════════════════════════════════════════════════════════════
+// 9. BSL / SSL STATE
+// ══════════════════════════════════════════════════════════════════════════════
+float lph = ta.pivothigh(high, ui_liq_len, ui_liq_len)
+float lpl = ta.pivotlow(low, ui_liq_len, ui_liq_len)
+
+f_add_liq(float px, bool is_high, int x) =>
+    float tol = atr14 * ui_eq_tol
+    bool merged = false
+    for q in liqs
+        if q.is_high == is_high and math.abs(q.px - px) <= tol
+            q.tag := is_high ? "EQH" : "EQL"
+            q.px := is_high ? math.max(q.px, px) : math.min(q.px, px)
+            merged := true
+            break
+    if not merged
+        liqs.push(Liq.new(px, is_high, x, is_high ? "BSL" : "SSL"))
+        if liqs.size() > 40
+            liqs.shift()
+    merged
+
+if run and ui_liq_on and barstate.isconfirmed
+    int qi = liqs.size() - 1
+    while qi >= 0
+        Liq q = liqs.get(qi)
+        if (q.is_high and high > q.px) or (not q.is_high and low < q.px)
+            liqs.remove(qi)
+        qi -= 1
+    if not na(lph)
+        f_add_liq(lph, true, bar_index - ui_liq_len)
+    if not na(lpl)
+        f_add_liq(lpl, false, bar_index - ui_liq_len)
+
+// ══════════════════════════════════════════════════════════════════════════════
+// 10. FAIR VALUE GAPS
+//     Partial fills cut the box. A close through the gap deletes it - never kept as iFVG.
+// ══════════════════════════════════════════════════════════════════════════════
+f_fvg_add(float top, float btm, bool bull, int lvl, int left) =>
+    if top - btm >= atr14 * ui_fvg_min and top > btm
+        bool dup = false
+        for f in fvgs
+            if f.bull == bull and f.lvl >= lvl and btm < f.top and top > f.btm
+                dup := true
+        if not dup
+            int k = fvgs.size() - 1
+            while k >= 0
+                Fvg f2 = fvgs.get(k)
+                if f2.bull == bull and f2.lvl < lvl and btm < f2.top and top > f2.btm
+                    box.delete(f2.bx)
+                    fvgs.remove(k)
+                k -= 1
+            color base = bull ? ui_fvg_bu : ui_fvg_be
+            int trn = lvl == 0 ? 86 : lvl == 1 ? 78 : 70
+            box b = box.new(left, top, left + 1, btm, xloc = xloc.bar_time, extend = extend.right, border_color = color.new(color.white, 100), border_width = 0, bgcolor = color.new(base, trn))
+            fvgs.push(Fvg.new(top, btm, bull, lvl, b))
+            if fvgs.size() > ui_fvg_max
+                Fvg old = fvgs.shift()
+                box.delete(old.bx)
+    bull
+
+if run and ui_fvg_on and barstate.isconfirmed
+    int fi = fvgs.size() - 1
+    while fi >= 0
+        Fvg f = fvgs.get(fi)
+        bool kill = f.bull ? close < f.btm : close > f.top
+        if not kill
+            if f.bull and low < f.top
+                f.top := math.max(low, f.btm)
+                box.set_top(f.bx, f.top)
+            else if not f.bull and high > f.btm
+                f.btm := math.min(high, f.top)
+                box.set_bottom(f.bx, f.btm)
+            if f.top - f.btm < syminfo.mintick
+                kill := true
+        if kill
+            box.delete(f.bx)
+            fvgs.remove(fi)
+        fi -= 1
+    if ui_fvg_ch and bar_index >= 2
+        if low > high[2]
+            f_fvg_add(low, high[2], true, 0, time[1])
+        if high < low[2]
+            f_fvg_add(low[2], high, false, 0, time[1])
+    if ui_fvg_h1 and v1 and g1chg
+        if g1l1 > g1h3
+            f_fvg_add(g1l1, g1h3, true, 1, g1t2)
+        if g1h1 < g1l3
+            f_fvg_add(g1l3, g1h1, false, 1, g1t2)
+    if ui_fvg_h2 and v2 and g2chg
+        if g2l1 > g2h3
+            f_fvg_add(g2l1, g2h3, true, 2, g2t2)
+        if g2h1 < g2l3
+            f_fvg_add(g2l3, g2h1, false, 2, g2t2)
+
+// ══════════════════════════════════════════════════════════════════════════════
+// 11. DRAWING (last bar only)
+// ══════════════════════════════════════════════════════════════════════════════
+f_clear()
+
+f_lx(int x0, int n, int i) => x0 + (n - 1 - i) * (pw + 1)
+
+f_pane_draw(Pane p, int x0, bool primary, int tclose, Model foc) =>
+    int n = math.min(p.cs.size(), p.cnt)
+    float sh = p.shift
+    float top = na
+    int xmin = na
+    int xmax = na
+    if n > 0
+        for i = 0 to n - 1
+            HCandle c = p.cs.get(i)
+            int xl = f_lx(x0, n, i)
+            int xr = xl + pw
+            int xm = xl + int(math.round(pw / 2.0))
+            bool bull = c.c >= c.o
+            float bt_ = math.max(c.o, c.c)
+            float bb_ = math.min(c.o, c.c)
+            f_bx(xl, bt_ - sh, xr, bb_ - sh, bull ? ui_bu_brd : ui_be_brd, bull ? ui_bu_bdy : ui_be_bdy)
+            color wk = bull ? ui_bu_wk : ui_be_wk
+            f_ln(xm, c.h - sh, xm, bt_ - sh, wk, line.style_solid, 1)
+            f_ln(xm, bb_ - sh, xm, c.l - sh, wk, line.style_solid, 1)
+            top := na(top) ? c.h : math.max(top, c.h)
+            xmin := na(xmin) ? xm : math.min(xmin, xm)
+            xmax := na(xmax) ? xm : math.max(xmax, xm)
+        // FVG inside the pane (3-candle gap between candle i and i+2)
+        if ui_imb and n >= 3
+            for i = 0 to n - 3
+                HCandle g1 = p.cs.get(i)
+                HCandle g2 = p.cs.get(i + 2)
+                int lx = f_lx(x0, n, i + 2)
+                int rx = f_lx(x0, n, i) + pw
+                if g1.l > g2.h and math.min(g1.o, g1.c) > math.max(g2.o, g2.c)
+                    f_bxn(lx, g1.l - sh, rx, g2.h - sh, ui_imb_fvg)
+                if g1.h < g2.l and math.max(g1.o, g1.c) < math.min(g2.o, g2.c)
+                    f_bxn(lx, g2.l - sh, rx, g1.h - sh, ui_imb_fvg)
+        // VI inside the pane (bodies gap, wicks overlap)
+        if ui_imb and n >= 2
+            for i = 0 to n - 2
+                HCandle v1c = p.cs.get(i)
+                HCandle v2c = p.cs.get(i + 1)
+                int lx2 = f_lx(x0, n, i + 1)
+                int rx2 = f_lx(x0, n, i) + pw
+                if v1c.l < v2c.h and math.min(v1c.o, v1c.c) > math.max(v2c.o, v2c.c)
+                    f_bxn(lx2, math.min(v1c.o, v1c.c) - sh, rx2, math.max(v2c.o, v2c.c) - sh, ui_imb_vi)
+                if v1c.h > v2c.l and math.max(v1c.o, v1c.c) < math.min(v2c.o, v2c.c)
+                    f_bxn(lx2, math.min(v2c.o, v2c.c) - sh, rx2, math.max(v1c.o, v1c.c) - sh, ui_imb_vi)
+        // C1 sweep lines + EQ lines between pane candles
+        if n >= 2
+            for i = 0 to n - 2
+                HCandle cu = p.cs.get(i)
+                HCandle nx = p.cs.get(i + 1)
+                int xmn = f_lx(x0, n, i + 1) + int(math.round(pw / 2.0))
+                int xend = f_lx(x0, n, i) + pw * 2
+                if ui_sw_on
+                    if cu.h > nx.h and cu.c < nx.h
+                        f_ln(xmn, nx.h - sh, xend, nx.h - sh, ui_sw_col, line.style_solid, 1)
+                    if cu.l < nx.l and cu.c > nx.l
+                        f_ln(xmn, nx.l - sh, xend, nx.l - sh, ui_sw_col, line.style_solid, 1)
+                if primary and ui_pane_mid
+                    float eqp = f_eq(nx.h, nx.l, nx.o, nx.c)
+                    f_ln(xmn, eqp - sh, f_lx(x0, n, i) + int(math.round(pw / 2.0)), eqp - sh, color.black, line.style_dotted, 1)
+        // C1..C4 tags on the focused model
+        if primary and ui_tags and not na(foc)
+            int k = -1
+            for j = 0 to p.cs.size() - 1
+                if p.cs.get(j).o_idx == foc.c2o
+                    k := j
+                    break
+            if k >= 0
+                for t = 0 to 3
+                    int ci = k + 1 - t
+                    bool want = t <= 1 or (t == 2 and foc.kind != "MID") or (t == 3 and foc.kind == "C4")
+                    if want and ci >= 0 and ci < n
+                        HCandle tcn = p.cs.get(ci)
+                        int tx = f_lx(x0, n, ci) + int(math.round(pw / 2.0))
+                        f_lb(tx, tcn.l - sh, "C" + str.tostring(t + 1), label.style_label_up, foc.failed ? color.red : color.gray, size.tiny)
+        if ui_timer and not na(xmin) and not na(xmax)
+            f_lb(int(math.round((xmin + xmax) / 2.0)), top - sh, f_tfname(p.tf) + "\n(" + f_rem(tclose) + ")", label.style_label_down, color.black, size.small)
+    x0 + n * (pw + 1) - 1 + 8
+
+f_draw_model(Model m, int rank, bool show_cisd, bool show_proj) =>
+    color cc = m.dir == 1 ? ui_bu_col : ui_be_col
+    string cst = f_style(m.dir == 1 ? ui_bu_sty : ui_be_sty)
+    int cw = m.dir == 1 ? ui_bu_wid : ui_be_wid
+    string up = m.dir == 1 ? label.style_label_up : label.style_label_down
+    string lsz = f_size(ui_ttfm_sz)
+    bool against_now = m.dir == 1 ? close < m.eq : close > m.eq
+    bool hidden = ui_hide_ag and against_now
+    color state_col = m.failed ? color.red : (bar_index - m.created_bar) >= m.form_bars ? color.orange : color.gray
+
+    // T-Spot zone + EQ
+    if ui_ts_on and not m.failed and not hidden
+        f_bxt(m.left_t, m.eq, m.right_t, m.zone_close, m.dir == 1 ? ui_ts_bu : ui_ts_be)
+        f_lnt(m.left_t, m.eq, m.right_t, m.eq, color.gray, f_style(ui_eq_sty), ui_eq_wid)
+    // TTFM labels
+    if ui_show_ttfm and m.kind != "MID"
+        if ui_c2
+            f_lb(m.c2_x, m.c2_px, m.failed ? "xC2" : "C2", up, state_col, lsz)
+        f_lb(m.start_idx, m.eq, m.kind == "C4" ? "C4" : "C3", up, state_col, lsz)
+    // Silver T-Spot
+    if m.silver != ""
+        f_lb(m.start_idx, m.dir == 1 ? low : high, m.silver, up, cc, size.tiny)
+    // real C1 sweep on the chart (latest 3)
+    if ui_sw_on and m.has_sweep and rank < 3
+        f_ln(m.sw_x1, m.sw_px, m.sw_x2, m.sw_px, ui_sw_col, f_style(ui_sw_sty), ui_sw_wid)
+    // CISD + protected swing dot + IC-CISD
+    if show_cisd
+        float brk = m.dir == 1 ? m.ser_hi : m.ser_lo
+        f_ln(m.ser_left, brk, m.cisd_bar, brk, cc, cst, cw)
+        if ui_dot_on
+            f_lb(m.ext_x, m.ext_px, "●", up, cc, f_size(ui_dot_sz))
+        if ui_ic_on and m.ic.size() > 0
+            for q in m.ic
+                f_ln(q.x, q.lv, q.e, q.lv, cc, cst, 1)
+                f_lb(q.ext_x, q.ext, "●", up, cc, size.tiny)
+    // projections (latest CISD only)
+    if show_proj and m.ser_hi > m.ser_lo
+        float rng = m.ser_hi - m.ser_lo
+        float base = m.dir == 1 ? m.ser_hi : m.ser_lo
+        string[] lv = str.split(ui_proj_lv, ",")
+        for i = 0 to array.size(lv) - 1
+            string ts = str.trim(array.get(lv, i))
+            float mul = str.tonumber(ts)
+            if not na(mul)
+                float py = m.dir == 1 ? base + rng * mul : base - rng * mul
+                if ui_proj_lb
+                    f_lb(m.ser_left, py, "-" + ts, label.style_label_right, ui_proj_col, f_size(ui_proj_lsz))
+                if ui_proj_ln
+                    f_ln(m.ser_left, py, bar_index + 1, py, ui_proj_col, f_style(ui_proj_sty), 1)
+    m
+
+f_liq_line(float px, int x, string tag, color c) =>
+    f_ln(x, px, bar_index + 1, px, c, f_style(ui_liq_sty), 1)
+    f_lb(bar_index + 2, px, tag, label.style_label_left, c, size.tiny)
+
+f_liq_draw() =>
+    array<Liq> hs = array.new<Liq>()
+    array<Liq> ls = array.new<Liq>()
+    for q in liqs
+        if q.is_high
+            if high < q.px
+                hs.push(q)
+        else if low > q.px
+            ls.push(q)
+    for side = 0 to 1
+        array<Liq> src = side == 0 ? hs : ls
+        int taken = 0
+        while taken < ui_liq_n and src.size() > 0
+            int bi = 0
+            float bd = 1.0e18
+            for i = 0 to src.size() - 1
+                float d = math.abs(src.get(i).px - close)
+                if d < bd
+                    bd := d
+                    bi := i
+            Liq pick = src.remove(bi)
+            f_liq_line(pick.px, pick.x, pick.tag, side == 0 ? ui_bsl_col : ui_ssl_col)
+            taken += 1
+    if ui_k_prev and p1.cs.size() >= 2
+        HCandle cur = p1.cs.get(0)
+        HCandle prv = p1.cs.get(1)
+        string tn = f_tfname(p1.tf)
+        if cur.h < prv.h
+            f_liq_line(prv.h, prv.h_idx, tn + " BSL", ui_bsl_col)
+        if cur.l > prv.l
+            f_liq_line(prv.l, prv.l_idx, tn + " SSL", ui_ssl_col)
+    if ui_k_d and chart_sec < 86400
+        if dH0 < dH1
+            f_liq_line(dH1, bar_index - 20, "PDH", ui_bsl_col)
+        if dL0 > dL1
+            f_liq_line(dL1, bar_index - 20, "PDL", ui_ssl_col)
+    if ui_k_w and chart_sec < 604800
+        if wH0 < wH1
+            f_liq_line(wH1, bar_index - 20, "PWH", ui_bsl_col)
+        if wL0 > wL1
+            f_liq_line(wL1, bar_index - 20, "PWL", ui_ssl_col)
+    0
+
+if barstate.islast and run and v1
+    Model focus = na
+    if models.size() > 0
+        focus := models.first()
+
+    // models: newest first; CISD capped by "CISD max history", projections only for the latest CISD
+    if models.size() > 0
+        int cisd_rank = 0
+        bool proj_done = false
+        for i = 0 to models.size() - 1
+            Model m = models.get(i)
+            bool cen = m.dir == 1 ? ui_bu_en : ui_be_en
+            bool has_c = m.cisd_done and m.has_chain and not m.failed
+            bool sc = has_c and cen and cisd_rank < ui_cisd_max
+            bool sp = has_c and ui_proj_on and not proj_done
+            f_draw_model(m, i, sc, sp)
+            if has_c
+                cisd_rank += 1
+                proj_done := true
+
+    // touch confirmation line
+    if ui_conf_on and not na(cfs.cf_px) and not na(cfs.cf_x1)
+        f_ln(cfs.cf_x1, cfs.cf_px, cfs.cf_x2, cfs.cf_px, cfs.cf_dir == 1 ? ui_bu_col : ui_be_col, f_style(cfs.cf_dir == 1 ? ui_bu_sty : ui_be_sty), cfs.cf_dir == 1 ? ui_bu_wid : ui_be_wid)
+
+    // formation liquidity
+    if ui_fl_on and flines.size() > 0
+        for fl in flines
+            f_ln(fl.x, fl.px, bar_index + 1, fl.px, ui_fl_col, f_style(ui_fl_sty), 1)
+
+    // SMT
+    if ui_smt and smts.size() > 0
+        for s in smts
+            f_ln(s.x1, s.y1, s.x2, s.y2, ui_smt_col, f_style(ui_smt_sty), ui_smt_wid)
+            if ui_smt_lbl
+                f_lb(int(math.round((s.x1 + s.x2) / 2.0)), (s.y1 + s.y2) / 2, s.name, s.bear ? label.style_label_down : label.style_label_up, ui_smt_col, f_size(ui_smt_lsz))
+
+    // HTF start lines on the chart (primary)
+    if ui_htf_lines and p1.cs.size() > 0
+        float vext = label_atr * ui_ext
+        int shown = math.min(p1.cs.size(), p1.cnt)
+        for i = 0 to shown - 1
+            HCandle hc = p1.cs.get(i)
+            f_ln(hc.o_idx, hc.h + vext, hc.o_idx, hc.l - vext, color.new(color.black, 85), line.style_solid, 1)
+            f_lb(hc.o_idx, hc.h + vext, f_open_txt(hc.o_time, htf1_sec), label.style_label_down, color.new(color.black, 55), size.tiny)
+
+    // HTF candles
+    if not ui_htf_hide
+        int x = bar_index + ui_offset
+        x := f_pane_draw(p1, x, true, tclose1, focus)
+        if p2.show
+            int x2 = stacked ? bar_index + ui_offset : x
+            int xn = f_pane_draw(p2, x2, false, tclose2, na)
+            x := stacked ? x : xn
+        if p3.show
+            int x3 = stacked ? bar_index + ui_offset : x
+            f_pane_draw(p3, x3, false, tclose3, na)
+
+    // BSL / SSL
+    if ui_liq_on
+        f_liq_draw()
+
+// ══════════════════════════════════════════════════════════════════════════════
+// 12. INFO TABLE
+// ══════════════════════════════════════════════════════════════════════════════
+string tblPos = switch ui_tbl_v + " " + ui_tbl_h
+    "Top Left"      => position.top_left
+    "Top Center"    => position.top_center
+    "Top Right"     => position.top_right
+    "Middle Left"   => position.middle_left
+    "Middle Center" => position.middle_center
+    "Middle Right"  => position.middle_right
+    "Bottom Left"   => position.bottom_left
+    "Bottom Center" => position.bottom_center
+    => position.bottom_right
+
+var table info = table.new(tblPos, 1, 6, bgcolor = color.new(color.gray, 100), border_width = ui_tbl_brd ? 1 : 0, border_color = ui_tbl_brd ? color.black : color.new(color.white, 100), frame_width = 0)
+
+if barstate.islast and ui_tbl_on and v1
+    string ft = "All Day"
+    if kzAny
+        ft := ""
+        if ui_f1
+            ft += ui_s1
+        if ui_f2
+            ft += (ft == "" ? "" : ", ") + ui_s2
+        if ui_f3
+            ft += (ft == "" ? "" : ", ") + ui_s3
+    int row = 0
+    if ui_tbl_fr
+        table.cell(info, 0, row, f_tfname(timeframe.period) + "-" + f_tfname(h1u) + " Model", text_color = color.black, text_size = f_size(ui_tbl_sz), text_font_family = font.family_monospace)
+        row += 1
+    if ui_tbl_as
+        table.cell(info, 0, row, syminfo.ticker, text_color = color.black, text_size = f_size(ui_tbl_sz), text_font_family = font.family_monospace)
+        row += 1
+    if ui_tbl_ch
+        table.cell(info, 0, row, f_tfname(timeframe.period), text_color = color.black, text_size = f_size(ui_tbl_sz), text_font_family = font.family_monospace)
+        row += 1
+    if ui_tbl_tt
+        table.cell(info, 0, row, f_rem(tclose1), text_color = color.black, text_size = f_size(ui_tbl_sz), text_font_family = font.family_monospace)
+        row += 1
+    if ui_tbl_bs
+        table.cell(info, 0, row, "Bias: " + bias_now, text_color = color.black, text_size = f_size(ui_tbl_sz), text_font_family = font.family_monospace)
+        row += 1
+    if ui_tbl_tf
+        table.cell(info, 0, row, ft, text_color = color.black, text_size = f_size(ui_tbl_sz), text_font_family = font.family_monospace)
+        row += 1
