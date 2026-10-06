@@ -226,6 +226,20 @@ type Fvg
     int   lvl
     box   bx
 
+type Conf
+    float piv_hi
+    float piv_lo
+    int   piv_hi_bar
+    int   piv_lo_bar
+    bool  ts_touched
+    float ts_level
+    int   ts_touch_bar
+    int   ts_model_bar
+    float cf_px
+    int   cf_x1
+    int   cf_x2
+    int   cf_dir
+
 type Model
     int    dir                 // 1 bullish, -1 bearish
     string kind                // "C3", "C4", "MID"
@@ -598,19 +612,8 @@ var array<line>  bl = array.new<line>()
 var array<box>   bb = array.new<box>()
 var array<label> bt = array.new<label>()
 
-// touch confirmation state (latest T-Spot)
-var bool   ts_touched = false
-var float  ts_level = na
-var int    ts_touch_bar = na
-var int    ts_model_bar = na
-var float  piv_hi = na
-var float  piv_lo = na
-var int    piv_hi_bar = na
-var int    piv_lo_bar = na
-var float  cf_px = na
-var int    cf_x1 = na
-var int    cf_x2 = na
-var int    cf_dir = 0
+// touch confirmation state (latest T-Spot) - kept in an object because functions cannot modify globals
+var Conf cfs = Conf.new()
 
 // pivot SMT state: current / previous chart pivot and the pair value at the same bar
 var float  ph0 = na
@@ -1011,41 +1014,41 @@ float bp_lo = ta.pivotlow(math.min(open, close), 2, 2)
 
 f_conf() =>
     if not na(bp_hi)
-        piv_hi := bp_hi
-        piv_hi_bar := bar_index - 2
+        cfs.piv_hi := bp_hi
+        cfs.piv_hi_bar := bar_index - 2
     if not na(bp_lo)
-        piv_lo := bp_lo
-        piv_lo_bar := bar_index - 2
+        cfs.piv_lo := bp_lo
+        cfs.piv_lo_bar := bar_index - 2
     if models.size() > 0
         Model m = models.first()
         if m.kind != "MID" and not m.failed
-            if na(ts_model_bar) or ts_model_bar != m.created_bar
-                ts_touched := false
-                ts_model_bar := m.created_bar
+            if na(cfs.ts_model_bar) or cfs.ts_model_bar != m.created_bar
+                cfs.ts_touched := false
+                cfs.ts_model_bar := m.created_bar
             float lvl = m.dir == 1 ? math.max(m.eq, m.zone_close) : math.min(m.eq, m.zone_close)
             if m.dir == -1
                 if (high > lvl or open > lvl) and close < lvl
-                    ts_touched := true
-                    ts_level := lvl
-                    ts_touch_bar := bar_index
+                    cfs.ts_touched := true
+                    cfs.ts_level := lvl
+                    cfs.ts_touch_bar := bar_index
             else
                 if (low < lvl or open < lvl) and close > lvl
-                    ts_touched := true
-                    ts_level := lvl
-                    ts_touch_bar := bar_index
-            if ts_touched and ui_conf_on
-                if m.dir == 1 and not na(piv_hi) and piv_hi_bar < ts_touch_bar and close > piv_hi and open < piv_hi and piv_hi > ts_level
-                    cf_px := piv_hi
-                    cf_x1 := piv_hi_bar
-                    cf_x2 := bar_index
-                    cf_dir := 1
-                    ts_touched := false
-                if m.dir == -1 and not na(piv_lo) and piv_lo_bar < ts_touch_bar and close < piv_lo and open > piv_lo and piv_lo < ts_level
-                    cf_px := piv_lo
-                    cf_x1 := piv_lo_bar
-                    cf_x2 := bar_index
-                    cf_dir := -1
-                    ts_touched := false
+                    cfs.ts_touched := true
+                    cfs.ts_level := lvl
+                    cfs.ts_touch_bar := bar_index
+            if cfs.ts_touched and ui_conf_on
+                if m.dir == 1 and not na(cfs.piv_hi) and cfs.piv_hi_bar < cfs.ts_touch_bar and close > cfs.piv_hi and open < cfs.piv_hi and cfs.piv_hi > cfs.ts_level
+                    cfs.cf_px := cfs.piv_hi
+                    cfs.cf_x1 := cfs.piv_hi_bar
+                    cfs.cf_x2 := bar_index
+                    cfs.cf_dir := 1
+                    cfs.ts_touched := false
+                if m.dir == -1 and not na(cfs.piv_lo) and cfs.piv_lo_bar < cfs.ts_touch_bar and close < cfs.piv_lo and open > cfs.piv_lo and cfs.piv_lo < cfs.ts_level
+                    cfs.cf_px := cfs.piv_lo
+                    cfs.cf_x1 := cfs.piv_lo_bar
+                    cfs.cf_x2 := bar_index
+                    cfs.cf_dir := -1
+                    cfs.ts_touched := false
     0
 
 if run and v1
@@ -1362,8 +1365,8 @@ if barstate.islast and run and v1
                 proj_done := true
 
     // touch confirmation line
-    if ui_conf_on and not na(cf_px) and not na(cf_x1)
-        f_ln(cf_x1, cf_px, cf_x2, cf_px, cf_dir == 1 ? ui_bu_col : ui_be_col, f_style(cf_dir == 1 ? ui_bu_sty : ui_be_sty), cf_dir == 1 ? ui_bu_wid : ui_be_wid)
+    if ui_conf_on and not na(cfs.cf_px) and not na(cfs.cf_x1)
+        f_ln(cfs.cf_x1, cfs.cf_px, cfs.cf_x2, cfs.cf_px, cfs.cf_dir == 1 ? ui_bu_col : ui_be_col, f_style(cfs.cf_dir == 1 ? ui_bu_sty : ui_be_sty), cfs.cf_dir == 1 ? ui_bu_wid : ui_be_wid)
 
     // formation liquidity
     if ui_fl_on and flines.size() > 0
